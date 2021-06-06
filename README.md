@@ -8,5 +8,8 @@ How to setup
 database structure should be the same as the one used , make sure the login details are also the same
 
 Download apache server here https://ampps.com/downloads for your os
+you will clone the project folder in wwww folder of the server application
+
+we are using vue js (javascript), codeigniter (PHP), and html for the web application
 
 
