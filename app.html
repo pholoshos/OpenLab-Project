@@ -10,6 +10,33 @@
     <script type="text/javascript" src="js/vuex.js"></script>
     <script type="text/javascript" src="js/vue-router.js"></script>
     <script type="text/javascript" src="js/vue.js"></script>
+    <style>
+      .dash {
+        background-color: white;
+        color: rgb(72, 71, 71);
+        
+      }
+      .it {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      @media only screen and (min-width : 701px){
+        .log {
+          margin-left:25%;
+          margin-top: 8%;
+        }
+      }
+      @media only screen and (max-width:700px){
+        .log {
+          margin-left:10%;
+          margin-top: 20%;
+        }
+      }
+      body{
+        background-color: rgb(57, 57, 57);
+        color: white;
+      }
+    </style>
     
     <script type="text/javascript" src="js/axios.min.js"></script>
 
@@ -21,7 +48,7 @@
       <div v-if="$store.state.isLoggedIn && !$store.state.loading">
         <dashboard></dashboard>
       </div>
-      <div v-if="!$store.state.isLoggedIn &&  !$store.state.loading" > 
+      <div class="container" v-if="!$store.state.isLoggedIn &&  !$store.state.loading" > 
         <login></login>
       </div>
 
