@@ -18,7 +18,18 @@
   <body>
     
     <div id="app">
-      <h1>{{text}}</h1>
+      <div v-if="$store.state.isLoggedIn && !$store.state.loading">
+        <dashboard></dashboard>
+      </div>
+      <div v-if="!$store.state.isLoggedIn &&  !$store.state.loading" > 
+        <login></login>
+      </div>
+
+      <div v-if="$store.state.loading">
+        <loading-page></loading-page>
+      </div>
+
+      
     </div>
 
     <!-- Option 1: Bootstrap Bundle with Popper -->
