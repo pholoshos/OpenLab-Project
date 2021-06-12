@@ -1,10 +1,64 @@
-
+<?php 
+$survername = "localhost";
+$username = "username";
+$password = "";
+$dbname = "login";
+try{$conn = new PDO("mysql: host=$survername;
+dbname=$dbname",$username,$password);
+   
+    $conn->setAttribute(PDO::ATTR_ERRMODE.PDO::ERRMODE_EXCEPTION);
+    
+    
+    //login define vars and assign zero
+    $name = $password = $nameErr $passwordErr =$err = "";
+    
+    
+    //validating form inputs
+    if ($_SERVER["REQUEST METHOD"] == "POST"){
+      //check if user name is empty
+      if(empty(test_input($_POST["name"]))){
+        $nameErr="enter username";
+        
+      }
+      else{
+      $name= test_input($_POST(["name"]);
+      }
+       if(empty(test_input($_POST["password"]))){
+        $passwordErr="enter password";
+        
+   }  else{
+      $password= test_input($_POST(["password"]);
+      }
+   //VALIDATE LOGGIN COORDINATES  
+       if(empty($nameErr)&&empty($password)){
+       
+         $stmt=$conn->query("SELECT id FROM 'user' WHERE  name= '$name' and password = '$password';");
+         if($stmt->execute()){
+         if($stmt->rowcount()==1){
+           session_start();
+           $_SESSION["name"] =$name;
+           header("location: welcome.php");
+           
+         }else{
+           $error = "username or password didnt match";
+         }
+       }
+                            
+catch(PDOException $e)
+{
+  echo "error: ".$e->getMessage(); 
+}
+                        
+function test_input($data){
+  $data =trim($data);
+  $data =stripcslashes($data);
+  $data =htmlspecialchars($data);
+  return $data;
+}
+?>
 
 <!DOCTYPE html>
-<!--[if lt IE 7 ]> <html lang="en" class="ie6 ielt8"> <![endif]-->
-<!--[if IE 7 ]>    <html lang="en" class="ie7 ielt8"> <![endif]-->
-<!--[if IE 8 ]>    <html lang="en" class="ie8"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--> <html lang="en"> <!--<![endif]-->
+ <html lang="en"> 
 <head>
 <meta charset="utf-8">
 <title>login</title>
@@ -13,7 +67,7 @@
 <body>
 <div class="container">
   <section id="content">
-    <form action="">
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF")?>">
       <h1>Login Form</h1>
       <div>
         <input type="text" placeholder="Username" required="" id="username" />
