@@ -38,7 +38,7 @@ Vue.component('login',{
             setTimeout(function(){
                 store.commit('doneLoading',false);
                 store.commit('login',true)
-            },1000)
+            },100000)
         }
     },
     template : '<div> <form class="col-md-6 col-10 alert log"> <h2>OpenLab</h2><p>Sign into your openlab account</p> <hr><div class="form-group"> <label for="workid">Work Id</label> <input v-model="workId" type="text" class="form-control" id="workid" aria-describedby="workid" placeholder="work id"> <small id="workid" class="form-text text-muted">enter your work id.</small> </div> <div class="form-group"><br> <label for="InputPassword1">Password</label> <input v-model="password" type="password" class="form-control" id="InputPassword1" placeholder="Password"> </div> <br><button type="button" @click="login()" class="btn btn-success">Sign in</button> </form></div>'
@@ -119,8 +119,8 @@ const router = new VueRouter({
 Vue.use(Vuex)
 const store = new Vuex.Store({
     state : {
-        isLoggedIn : true,
-        loading :  false,
+        isLoggedIn : false,
+        loading :  true,
         taskTitle  : ''
 
     },
@@ -154,7 +154,7 @@ var app = new Vue({
         const self = this;
         setTimeout(function(){
             store.commit('doneLoading',false);
-        },1000)
+        },100000)
         
     },
 })
