@@ -63,12 +63,15 @@ Vue.component('manage-employees',{
         },
         
     },
-    template : '<div class="container">  <div> <br> <h4>Manage employees</h4> <button class="btn btn-secondary" @click="options(2)">Add</button> <button class="btn btn-secondary" @click="options(1)">View</button> <button class="btn btn-secondary">Delete</button>  <hr>  <view-employee v-if="view== 1"></view-employee> <create-employee v-if="view == 2"></create-employee>  <br></div> <br></div>'
+    template : '<div class="container">  <div> <br> <h4>Manage employees</h4> <button class="btn btn-secondary" @click="options(2)">Add</button> <button class="btn btn-secondary" @click="options(1)">View</button> <button class="btn btn-secondary" @click="options(3)">Delete</button>  <hr>  <view-employee v-if="view== 1"></view-employee> <create-employee v-if="view == 2"></create-employee> <delete-employee v-if="view == 3"></delete-employee>  <br></div> <br></div>'
 })
 Vue.component('view-employee',{
     template : '<div><table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th> <th scope="col">Phone</th> <th scope="col">email address</th> </tr> </thead> <tbody> <tr v-for="a in 4"> <th scope="row">1</th> <td>Mark</td> <td>Otto</td> <td>@mdo</td> </tr> </tbody> </table></div>'
 })
 
+Vue.component('delete-employee',{
+    template : '<div> <h6>Delete Employee</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in 4"> <th scope="row">1</th> <td>Mark</td><td><button class="btn btn-danger">x</button></td> </tr> </tbody> </table> <br>  </div>'
+})
 
 
 Vue.component('tasks',{
@@ -78,7 +81,7 @@ Vue.component('tasks',{
 
 
 Vue.component('tools',{
-    template : '<ul class="list-group list-group-flush"> <li  class="list-group-item"><router-link class="link" to="/dashboard/manage/employees">Manage Employees</router-link></li> <li class="list-group-item">more</li> <li class="list-group-item">Manage tasks</li> <li class="list-group-item">notice board</li>  </ul>'
+    template : '<ul class="list-group list-group-flush"> <li  class="list-group-item"><router-link class="link" to="/dashboard/manage/employees">Manage Employees</router-link></li> <li class="list-group-item"><router-link to="/app/info" class="link"> tips and info</router-link></li> <li class="list-group-item">Manage tasks</li> <li class="list-group-item">notice board</li>  </ul>'
 })
 Vue.component('create-job',{
 
@@ -115,7 +118,11 @@ Vue.component('loading-screen',{
 
     },
     template : '<div style="align-items: center;text-align: center;margin: 15%;"> <div style="background-color:rgb(57, 57, 57)" class="loadingio-spinner-wedges-a1kf65dids"><div class="ldio-4d3gymeqpee"> <div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div></div> </div></div>  </div>'
-  })
+})
+
+Vue.component('info',{
+    template : '<div> <br> <h4>App info and tips</h4> <p>Learn more about openlab</p> <hr>  <br></div>'
+})
 
 const routes = [
     {
@@ -129,6 +136,10 @@ const routes = [
     {
         path: '/dashboard/profile',
         component: 'profile'
+    },
+    {
+        path: '/app/info',
+        component: 'info'
     },
     {
         path : '/dashboard/createtask',
