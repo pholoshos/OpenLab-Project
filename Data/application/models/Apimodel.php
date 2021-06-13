@@ -46,36 +46,40 @@ class ApiModel extends CI_Model
 
 
 	public function createEmployee(){
+		//managers details
 		$id = $this->input->get("id");
+		$auth = $this->input->get("authkey");
+
+		//new account details
 		$name = $this->input->get("name");
 		$email = $this->input->get("email");
+		$accountEmail = $this->input->get("accountEmail");
 		$phone = $this->input->get("phone");
+		$position = $this->input->get("position");
 		$password = $this->input->get("password");
 		
 		$data = [
 			email => $email
 		];
 		
-		$query = $this->db->get_where('users',$data);
+		$query = $this->db->get_where('employees',$data);
 			
 		$final = $query->row_array();
 		if($final == null){
 			try{
-				if(valid_email($email) && strlen($name) > 4 && strlen($password) > 7){
+				if(valid_email($email) && strlen($name) > 40 && strlen($password) > 7){
 					$account = 'user';
 					if($id == 'ja1EzqCpe3L7Im7JCWBcJU0P'){
 						$account = 'admin';
 					}
 					$newData = [
-						user => $name,
-						email => $email,
-						account => $account,
+						name => $name,
+						email => $accountEmail,
+						//account => $account,
+						position => $position,
 						phone => $phone,
 						authkey => random_string('alnum', 12),
-						userkey => random_string('alnum', 12),
-						password => $password,
-						bankingdetails => 'none',
-						
+						//userkey => random_string('alnum', 12),
 	
 					];
 					$newD = [
