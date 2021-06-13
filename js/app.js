@@ -25,7 +25,7 @@ Vue.component('loading-item',{
     template : '<div class="loadingio-spinner-wedges-3h1sjibkbht"><div class="ldio-d917io5x8e"> <div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div></div> </div></div>'
 })
 Vue.component('create-employee',{
-    template : '<div>  <h4>New Employee </h4> <p>Add your tasks details below</p> <hr>  <label>Employee Name</label> <input class="form-control" placeholder="name"></input>  <br> <label>Email Address</label><input class="form-control" placeholder="email address"></input> <br> <button class="btn btn-success" >Create</button> <br><br></div>'
+    template : '<div>  <h4>New Employee </h4> <p>Add your tasks details below</p> <hr>  <label>Employee Name</label> <input class="form-control" placeholder="name"></input>  <br> <label>Email Address</label><input class="form-control" placeholder="email address"></input> <br><label>name</label><input class="form-control" placeholder="name"></input> <br><label>Phone number</label><input class="form-control" placeholder="phone"></input> <br> <label>Employee Id</label><input class="form-control" placeholder="employee id"></input> <br> <button class="btn btn-success" >Create</button> <br><br></div>'
 })
 
 Vue.component('login',{
@@ -79,7 +79,22 @@ Vue.component('tasks',{
 })
 
 Vue.component('notice-view',{
-    template : '<div> <br> <h4>Notifications</h4> <p>know whats going on</p> <hr> <notifications></notifications> </div>'
+    data : function(){
+        return{
+            view : 1
+        }
+    },
+    methods: {
+        options : function(i){
+            const self = this;
+            self.view = i;
+        }
+    },
+    template : '<div> <br> <h4>Notifications</h4> <p>know whats going on</p><div><button @click="options(1)" class="btn btn-secondary">View</button>  <button @click="options(2)" class="btn btn-secondary">New Notification</button>  </div><hr> <notifications v-if="view ==1"></notifications> <create-notification v-if="view == 2"> </create-notification> </div>'
+})
+
+Vue.component('create-notification',{
+    template : '<div><h4>Create notification</h4>  <div> <label>Enter your title</label><input class="form-control" placeholder="enter title"> <br> <label>Enter your title</label><input class="form-control" placeholder="enter body"></div> <button class="btn btn-success">Create</button> <br><br> </div>'
 })
 
 Vue.component('notifications',{
