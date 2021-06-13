@@ -38,7 +38,7 @@ Vue.component('login',{
             setTimeout(function(){
                 store.commit('doneLoading',false);
                 store.commit('login',true)
-            },100000)
+            },1000)
         }
     },
     template : '<div> <form class="col-md-6 col-10 alert log"> <h2>OpenLab</h2><p>Sign into your openlab account</p> <hr><div class="form-group"> <label for="workid">Work Id</label> <input v-model="workId" type="text" class="form-control" id="workid" aria-describedby="workid" placeholder="work id"> <small id="workid" class="form-text text-muted">enter your work id.</small> </div> <div class="form-group"><br> <label for="InputPassword1">Password</label> <input v-model="password" type="password" class="form-control" id="InputPassword1" placeholder="Password"> </div> <br><button type="button" @click="login()" class="btn btn-success">Sign in</button> </form></div>'
@@ -48,12 +48,16 @@ Vue.component('main-view',{
 })
 
 Vue.component('manage-employees',{
-    template : '<div>manage employees</div>'
+    template : '<div class="container"> <div > <br> <h4>Manage employees</h4> <button class="btn btn-secondary">Add</button><button class="btn btn-secondary">Delete</button>  <hr> <br> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th> <th scope="col">Phone</th> <th scope="col">email address</th> </tr> </thead> <tbody> <tr v-for="a in 4"> <th scope="row">1</th> <td>Mark</td> <td>Otto</td> <td>@mdo</td> </tr> </tbody> </table> <br></div> <br></div>'
 })
+
+
 
 Vue.component('tasks',{
     template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in 3"> <div class="card "> <div class="card-header"> Send Email </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>send message to john</p> <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer> </blockquote>  <button class="btn btn-success">close job</button> </div></div> </div></div></div>'
 })
+
+
 
 Vue.component('tools',{
     template : '<ul class="list-group list-group-flush"> <li  class="list-group-item"><router-link class="link" to="/dashboard/manage/employees">Manage Employees</router-link></li> <li class="list-group-item">more</li> <li class="list-group-item">Manage tasks</li> <li class="list-group-item">notice board</li>  </ul>'
@@ -63,7 +67,14 @@ Vue.component('create-job',{
     template : ' <div> <input ><input></div>'
 })
 Vue.component('profile',{
-    template : '<div>profile</div>'
+    data : function(){
+        return{
+            account : 'default',
+            email : 'example@email.com',
+            phone : '00 000 0000'
+        }
+    },
+    template : '<div><br> <h4>Profile</h4> <hr> <p>Account name : {{account}}</p> <p>Email address: {{email}}</p> <p>Phone Number : {{phone}}</p> <br> <br><br></div>'
 })
 
 Vue.component('creating-task',{
@@ -71,7 +82,7 @@ Vue.component('creating-task',{
 })
 
 Vue.component('nav-bar',{
-    template : '<div>    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> <div class="container-fluid"> <router-link class="navbar-brand" to="/dashboard/home" >OpenLab</router-link> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="navbarNav"> <ul class="navbar-nav"> <li class="nav-item"> <router-link class="navbar-brand" to="/dashboard/profile" >Profile</router-link> </li> <li class="nav-item"> <router-link class="navbar-brand" to="/dashboard/create" >Create</router-link> </li> <li class="nav-item"> <router-link class="navbar-brand" to="/dashboard/organisation" >OpenLab</router-link> </li> </ul> </div> </div> </nav></div>'
+    template : '<div>    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> <div class="container-fluid"> <router-link class="navbar-brand" to="/dashboard/home" >OpenLab</router-link> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="navbarNav"> <ul class="navbar-nav"> <li class="nav-item"> <router-link class="navbar-brand" to="/dashboard/profile" >Profile</router-link> </li> </ul> </div> </div> </nav></div>'
 })
 
 Vue.component('landing-page',{
@@ -119,8 +130,8 @@ const router = new VueRouter({
 Vue.use(Vuex)
 const store = new Vuex.Store({
     state : {
-        isLoggedIn : false,
-        loading :  true,
+        isLoggedIn : true,
+        loading :  false,
         taskTitle  : ''
 
     },
@@ -154,7 +165,7 @@ var app = new Vue({
         const self = this;
         setTimeout(function(){
             store.commit('doneLoading',false);
-        },100000)
+        },1000)
         
     },
 })

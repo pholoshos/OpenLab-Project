@@ -1,0 +1,25 @@
+[{
+    "order": "Bmx Bikes",
+    "quantity" : 12,
+    "author" : "andrew Young",
+    "date"  : "21 march 2019",
+    "status" : "Out of Shop",
+    "clientName" : "Nic Tesla",
+    "clientPhone" : "0720648709",
+    "clientAddress" : "949 ds , Praktiseer Burgersfort"
+},
+{
+     "order": "grey jeans",
+    "quantity" : 4,
+    "author" : "Pholosho Seloane",
+    "date"  : "21 march 2019",
+    "status" : "Order still proccessing",
+    "clientName" : "Thomas Eddison",
+    "clientPhone" : "0720648709",
+    "clientEmail" : "pholosho@softmoremo.co.za",
+    "clientAddress" : "949 Darkcity , Praktiseer Burgersfort"
+    
+    
+}
+
+]
