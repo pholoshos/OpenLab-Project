@@ -78,10 +78,16 @@ Vue.component('tasks',{
     template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in 3"> <div class="card "> <div class="card-header"> Send Email </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>send message to john</p> <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer> </blockquote>  <button class="btn btn-success">close job</button> </div></div> </div></div></div>'
 })
 
+Vue.component('notice-view',{
+    template : '<div> <br> <h4>Notifications</h4> <p>know whats going on</p> <hr> <notifications></notifications> </div>'
+})
 
+Vue.component('notifications',{
+    template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in 3"> <div class="card "> <div class="card-header"> Alert </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>send message to john</p> <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer> </blockquote>   </div></div> </div></div></div>'
+})
 
 Vue.component('tools',{
-    template : '<ul class="list-group list-group-flush"> <li  class="list-group-item"><router-link class="link" to="/dashboard/manage/employees">Manage Employees</router-link></li> <li class="list-group-item"><router-link to="/app/info" class="link"> tips and info</router-link></li> <li class="list-group-item">Manage tasks</li> <li class="list-group-item">notice board</li>  </ul>'
+    template : '<ul class="list-group list-group-flush"> <li  class="list-group-item"><router-link class="link" to="/dashboard/manage/employees">Manage Employees</router-link></li> <li class="list-group-item"><router-link to="/app/info" class="link"> tips and info</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/manage/tasks">Manage tasks</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/notice">notice board</router-link></li>  </ul>'
 })
 Vue.component('create-job',{
 
@@ -124,6 +130,32 @@ Vue.component('info',{
     template : '<div> <br> <h4>App info and tips</h4> <p>Learn more about openlab</p> <hr>  <br></div>'
 })
 
+Vue.component('manage-tasks',{
+    data : function(){
+        return {
+            view : 1
+        }
+    },
+    methods: {
+        options: function(i){
+            const self = this;
+            self.view = i;
+        }
+    },
+    template : '<div> <br> <h4>Manage your tasks</h4>  <p>select your tasks</p> <button class="btn btn-secondary" @click="options(1)">View</button> <button class="btn btn-secondary" @click="options(2)">Delete</button>  <hr> <delete-task  v-if="view ==2"></delete-task>  <view-task v-if="view ==1"></view-task> <br><br> </div>'
+})
+
+Vue.component('delete-task',{
+    template : '<div> <h4>Delete tasks</h4> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">Task</th> <th scope="col">for</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in 4"> <th scope="row">1</th> <td>Mark</td><td><button class="btn btn-danger">x</button></td> </tr> </tbody> </table> </div>'
+})
+Vue.component('add-tasks',{
+    template : '<div>add</div>'
+})
+
+Vue.component('view-task',{
+    template : '<div> <h6>viewing tasks</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">Task</th> <th scope="col">for</th><th scope="col">description</th></tr> </thead> <tbody> <tr v-for="a in 4"> <th scope="row">1</th> <td>Mark</td><td>Send email</td> </tr> </tbody> </table>  </div>'
+})
+
 const routes = [
     {
         path: '/',
@@ -134,8 +166,16 @@ const routes = [
         component : 'main-view'
     },
     {
+        path: '/dashboard/notice',
+        component : 'notice-view'
+    },
+    {
         path: '/dashboard/profile',
         component: 'profile'
+    },
+    {
+        path: '/dashboard/manage/tasks',
+        component: 'manage-tasks'
     },
     {
         path: '/app/info',
@@ -160,7 +200,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
     state : {
         isLoggedIn : true,
-        loading :  false,
+        loading : false,
         taskTitle  : ''
 
     },
