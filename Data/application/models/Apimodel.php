@@ -689,14 +689,12 @@ class ApiModel extends CI_Model
 
 						$response = [
 							res => "correct",
-							user => $final['user'],
+							user => $final['name'],
 							id => $final['id'],
 							email => $final['email'],
 							phone => $final['phone'],
+							position => $final['position'],
 							authkey => $newAuthKey,
-							userkey => $final['userkey'],
-							account => $final['account']
-							
 
 						];
 						echo json_encode($response);
@@ -721,6 +719,7 @@ class ApiModel extends CI_Model
 	public function login(){
 
 	}
+}
 
 
 

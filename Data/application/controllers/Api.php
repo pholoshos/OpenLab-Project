@@ -11,7 +11,8 @@ class Api extends CI_Controller {
 		}
 	public function auth(){
 		$req = $_SERVER['REQUEST_METHOD'];
-		if($req == 'GET'){
+
+		if($req == 'GET'){			
 			$this->apimodel->auth();
 		}
 
@@ -52,6 +53,15 @@ class Api extends CI_Controller {
 		}
 
 	}
+	public function getNotification(){
+		$req = $_SERVER['REQUEST_METHOD'];
+		if($req == 'GET'){
+			$this->apimodel->getNotification();
+		}
+
+	}
+
+
 	//send user details
 	public function userDetails(){
 		$req = $_SERVER['REQUEST_METHOD'];
