@@ -4,6 +4,12 @@ function checkData(item, limit){
     return !(len < limit);
 }
 
+function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+  }
+
 Vue.use(VueRouter)
 Vue.component('dashboard',{
     data : function(){
@@ -30,7 +36,45 @@ Vue.component('loading-item',{
     template : '<div class="loadingio-spinner-wedges-3h1sjibkbht"><div class="ldio-d917io5x8e"> <div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div></div> </div></div>'
 })
 Vue.component('create-employee',{
-    template : '<div>  <h4>New Employee </h4> <p>Add your tasks details below</p> <hr>  <label>Employee Name</label> <input class="form-control" placeholder="name"></input>  <br> <label>Email Address</label><input class="form-control" placeholder="email address"></input> <br><label>name</label><input class="form-control" placeholder="name"></input> <br><label>Phone number</label><input class="form-control" placeholder="phone"></input> <br> <label>Employee Id</label><input class="form-control" placeholder="employee id"></input> <br> <button class="btn btn-success" >Create</button> <br><br></div>'
+    data : function(){
+        return{
+            phone : '',
+            email : '',
+            password  : '',
+            workId : '',
+            position : '',
+            name : ''
+        }
+    },
+    methods: {
+        create : async function(){
+            const self = this;
+            var check = checkData(self.phone,10) && checkData(self.password,8) && checkData(self.email,5) &&checkData(self.workId,8) &&checkData(self.name,2) && checkData(self.position,3); 
+            if(check == true){
+                try{
+                    store.commit('isLoading',true);
+                    var createUrl = "";
+                    await axios.get(createUrl,{
+                        params : {
+                            phone : self.phone,
+                            email : self.email,
+                            password : self.password,
+                            position : self.position,
+                            name : self.name,
+                            workId : self.workId
+                        }
+
+                    }).then(function(response){
+                        
+                    })
+                }catch{
+
+                }
+
+            }
+        }
+    },
+    template : '<div>  <h4>New Employee </h4> <p>Add your tasks details below</p> <hr>  <label>Employee Name</label> <input class="form-control" v-model="name" placeholder="name"></input>  <br> <label>Email Address</label><input class="form-control" v-model="email" placeholder="email address"></input> <br><label>Password</label><input class="form-control"  placeholder="password" v-model="password"></input> <br><label>Phone number</label><input class="form-control" v-model="phone" placeholder="phone"></input> <br> <label>Work Id</label><input v-model="workId" class="form-control" placeholder="work id"></input> <br> <label>Position</label><input v-model="position" class="form-control" placeholder="position"></input> <br> <button class="btn btn-success" @click="create()">Create</button> <br><br></div>'
 })
 
 Vue.component('login',{
@@ -39,24 +83,30 @@ Vue.component('login',{
             password : '',
             workId : '',
             warning : '..',
+            authUrl : 'http://localhost/OpenLab-Project/data/index.php/api/auth'
         }
     },
-
+    mounted() {
+        //this.login2();
+    },
     methods: {
-        
-        login : function(){
+      login : async function(){
             const self = this;
-            var authUrl = 'http://localhost/OpenLab-Project/data/index.php/api/auth';
+            
             if(checkData(self.workId,8)&&checkData(self.password,8)){
                 try{
                     store.commit('isLoading',true)
-                    axios.get(authUrl,{
+                    await axios.get(self.authUrl,{
                         params:{
                             workId : self.workId,
                             password : self.password
                         }
                     }).then(function(response){
                         if(response.data.res == "correct"){
+                            console.log(response.data);
+                            store.commit('updateAccount',response.data);
+                            document.cookie = "id="+ response.data.id +"; SameSite = None; Secure";
+                            document.cookie = "authkey="+ response.data.authkey +"; SameSite = None; Secure";
                             setTimeout(function(){
                                 store.commit('isLoading',false);
                                 store.commit('login',true)
@@ -143,7 +193,18 @@ Vue.component('notifications',{
 })
 
 Vue.component('tools',{
-    template : '<ul class="list-group list-group-flush"> <li  class="list-group-item"><router-link class="link" to="/dashboard/manage/employees">Manage Employees</router-link></li> <li class="list-group-item"><router-link to="/app/info" class="link"> tips and info</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/manage/tasks">Manage tasks</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/notice">notice board</router-link></li>  </ul>'
+    methods: {
+        signOut : function(){
+            store.commit('isLoading',true);
+            document.cookie = "id="+ "0" +"; SameSite = None; Secure";
+            document.cookie = "authkey="+ "0" +"; SameSite = None; Secure";
+            setTimeout(function(){
+                store.commit('isLoading',false);
+                store.commit('login',false)
+            },2000)
+        }
+    },
+    template : '<ul class="list-group list-group-flush"> <li  class="list-group-item"><router-link class="link" to="/dashboard/manage/employees">Manage Employees</router-link></li> <li class="list-group-item"><router-link to="/app/info" class="link"> tips and info</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/manage/tasks">Manage tasks</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/notice">notice board</router-link></li> <li  class="list-group-item"><a @click="signOut()">Sign Out</a></li> </ul>'
 })
 Vue.component('create-job',{
 
@@ -152,9 +213,9 @@ Vue.component('create-job',{
 Vue.component('profile',{
     data : function(){
         return{
-            account : 'default',
-            email : 'example@email.com',
-            phone : '00 000 0000'
+            account : store.state.account.name,
+            email : store.state.account.email,
+            phone : store.state.account.phone
         }
     },
     template : '<div><br> <h4>Profile</h4> <hr> <p>Account name : {{account}}</p> <p>Email address: {{email}}</p> <p>Phone Number : {{phone}}</p> <br> <br><br></div>'
@@ -295,15 +356,47 @@ var app = new Vue({
         text : 'hello people'
     },
     methods: {
-        stoploading: function(){
-            
-        }
+        login2 : async function() {
+            if(getCookie("authkey",8)){
+                try{
+                    store.commit('isLoading',true)
+                    await axios.get("http://localhost/OpenLab-Project/data/index.php/api/second_auth",{
+                        params:{
+                            authkey : getCookie("authkey"),
+                            workId : getCookie("id")
+                        }
+                    }).then(function(response){
+                        if(response.data.res == "correct"){
+                            console.log(response.data);
+                            store.commit('updateAccount',response.data);
+                            document.cookie = "id="+ response.data.id +"; SameSite = None; Secure";
+                            document.cookie = "authkey="+ response.data.authkey +"; SameSite = None; Secure";
+                            setTimeout(function(){
+                                store.commit('isLoading',false);
+                                store.commit('login',true)
+                            },2000)
+                        }else{
+                            //failed to login
+                            store.commit('isLoading',false);
+                            store.commit('login',false)
+                            //console.log('hello')
+                            //var notification = alertify.notify('Error: check your details', '', 10, function(){  console.log('dismissed'); });
+                            
+                            
+                        }
+                    })
+                }catch{
+                    store.commit('isLoading',false);
+                    store.commit('login',false)
+                }
+            }else{
+                store.commit('isLoading',false);
+                store.commit('login',false)
+            }
+        },
+  
     },
     mounted() {
-        const self = this;
-        setTimeout(function(){
-            store.commit('isLoading',false);
-        },1000)
-        
+        this.login2()
     },
 })

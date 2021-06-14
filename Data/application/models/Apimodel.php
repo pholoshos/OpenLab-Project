@@ -17,12 +17,12 @@ class ApiModel extends CI_Model
 	}
 
 	public function check_auth(){
-		$id = $this->input->get("id");
+		$id = $this->input->get("workId");
 		$authkey = $this->input->get("authkey");
 		echo $authkey;
 		if(isset($id,$authkey)){
 			$data = [
-				id => $id
+				work_id => $id
 			];
 			try{
 				$query = $this->db->get_where('users',$data);
@@ -240,337 +240,27 @@ class ApiModel extends CI_Model
 		}
 	}
 
-	public function approveRequest(){
-		$id = $this->input->get("id");
-		$authkey = $this->input->get("authkey");
-		$holder = $this->input->get("holder"); 
-		$coinkey = $this->input->get("coinkey");
-		$value = $this->input->get("value");
-		$userkey = $this->input->get("userkey");
-		$email = $this->input->get("email");
-		$phone = $this->input->get("phone");
-		$username = $this->input->get("name");
-
-		
-		if(isset($id,$authkey)){
-			$data = [
-				id => $id
-			];
-			
-			try{
-
-				$query = $this->db->get_where('users',$data);
-				
-				$final = $query->row_array();
-				
-				if($final != null){
-
-					$tempAuth = $final['authkey'];
-					$accountType = $final['account'];
-					if($tempAuth == $authkey && $accountType == 'admin'){
-						
-						$checkData = [
-							value => $value,
-							coinkey => $coinkey,	
-							results => "approved"
-						];
-						
-						$checkQ = $this->db->get_where('requests',$checkData);
-						$finalCheck = $checkQ->row_array();
-						if($finalCheck == null){
-
-							$newData2 = [
-								coinkey => $coinkey,
-								holder => $holder,
-
-
-							];
-							$this->db->set('results','approved');
-							$this->db->where($newData2);
-							$this->db->update('requests');
-							$newData3 = [
-								holder => $holder,
-								value =>$value,
-								coinkey => random_string('alnum', 12),
-								type => 'standard',
-								state => 'active',
-								holderid => $id,
-								userkey => $userkey,
-								withdrawdate => '',
-								useremail => $email,
-								userphone => $phone,
-								username => $username,
-								date =>  date("Y-m-d"),
-							];
-							$this->db->insert('usercoins',$newData3);
-
-							$dataToSend = [
-								res => "correct",
-								
-								
-							];
-							echo json_encode($dataToSend);
-						}else{
-							$dataToSend = [
-								res => "exist"
-							];
-							echo json_encode($dataToSend);
-						}
-
-						
-						}
-
-					}else{
-						echo "helo";
-						return false;
-					}
-				
-			}catch(Throwable $e){
-				echo $e;
-				echo "helo";
-			}
-
-		}else{
-			echo "helo";
-			return false;
-		}
-	}
-	public function approveWithdrawal(){
-		$id = $this->input->get("id");
-		$authkey = $this->input->get("authkey");
-		$holder = $this->input->get("holder"); 
-		$coinkey = $this->input->get("coinkey");
-		$value = $this->input->get("value");
-		$userkey = $this->input->get("userkey");
-
-		
-		if(isset($id,$authkey)){
-			$data = [
-				id => $id
-			];
-			
-			try{
-
-				$query = $this->db->get_where('users',$data);
-				
-				$final = $query->row_array();
-				
-				if($final != null){
-
-					$tempAuth = $final['authkey'];
-					$accountType = $final['account'];
-					if($tempAuth == $authkey && $accountType == 'admin'){
-						
-						$checkData = [
-							value => $value,
-							coinkey => $coinkey,	
-							results => "paid"
-						];
-						
-						$checkQ = $this->db->get_where('requests',$checkData);
-						$finalCheck = $checkQ->row_array();
-						if($finalCheck == null){
-
-							$newData2 = [
-								coinkey => $coinkey,
-								holder => $holder,
-
-
-							];
-							$this->db->set('state','paid');
-							$this->db->where($newData2);
-							$this->db->update('usercoins');
-
-							$dataToSend = [
-								res => "correct",
-								
-								
-							];
-							echo json_encode($dataToSend);
-						}else{
-							$dataToSend = [
-								res => "exist"
-							];
-							echo json_encode($dataToSend);
-						}
-
-						
-						}
-
-					}else{
-						echo "helo";
-						return false;
-					}
-				
-			}catch(Throwable $e){
-				echo $e;
-				echo "helo";
-			}
-
-		}else{
-			echo "helo";
-			return false;
-		}
-	}
-	//requests
-	public function userRequests(){
-		$id = $this->input->get("id");
-		$authkey = $this->input->get("authkey");
-		$userkey =  $this->input->get("userkey");
-	
-		//echo $authkey;
-		if(isset($id,$authkey)){
-			$data = [
-				id => $id,
-
-			];
-			
-			try{
-				$query = $this->db->get_where('users',$data);
-				$final = $query->row_array();
-				if($final == !null){
-					$tempAuth = $final['authkey'];
-					$accountType = $final['account'];
-					if($tempAuth == $authkey && $accountType == 'admin'){
-						$newData = [
-							
-							results => 'none',
-
-
-						];
-						$newQuery = $this->db->get_where('requests',$newData);
-						$final = $newQuery->result();
-						if($final != null){
-							$dataToSend = [
-								res => "correct",
-								requests => $final
-							];
-							echo json_encode($dataToSend);
-						}else{
-							$dataToSend = [
-								res => "bad",
-								
-							];
-							echo json_encode($dataToSend);
-						}
-
-					}else{
-						return false;
-					}
-				}
-			}catch(Throwable $e){
-				return false;
-			}
-
-		}else{
-			return false;
-		}
-	}
-
-	//request which are accepted for user
-	public function userReq2(){
-		$id = $this->input->get("id");
-		$authkey = $this->input->get("authkey");
-		//echo $authkey;
-		if(isset($id,$authkey)){
-			$data = [
-				id => $id
-			];
-			
-			try{
-				$query = $this->db->get_where('users',$data);
-				$final = $query->row_array();
-				if($final == !null){
-					$tempAuth = $final['authkey'];
-					if($tempAuth == $authkey){
-						$newData = [
-							
-							results => 'approved',
-							requester => $id,
-
-						];
-						$newQuery = $this->db->get_where('requests',$newData);
-						$final = $newQuery->result();
-						if($final != null){
-							$dataToSend = [
-								res => "correct",
-								requests => $final
-							];
-							echo json_encode($dataToSend);
-						}else{
-							$dataToSend = [
-								res => "bad",
-								
-							];
-							echo json_encode($dataToSend);
-						}
-
-					}else{
-						return false;
-					}
-				}
-			}catch(Throwable $e){
-				return false;
-			}
-
-		}else{
-			return false;
-		}
-	}
-	public function withdrawals(){
-		$id = $this->input->get("id");
-		$authkey = $this->input->get("authkey");
-		//echo $authkey;
-		if(isset($id,$authkey)){
-			$data = [
-				id => $id
-			];
-			try{
-				$query = $this->db->get_where('users',$data);
-				$final = $query->row_array();
-				if($final == !null){
-					$tempAuth = $final['authkey'];
-					if($tempAuth == $authkey  && $final['account'] == 'admin'){
-						$newData = [state => 'requested'];
-						
-						$newQuery = $this->db->get_where('usercoins',$newData);
-						$final2 = $newQuery->result();
-						$dataToSend = [
-							res => "correct",
-							coins => $final2
-						];
-						echo json_encode($dataToSend);
-						
-					}else{
-						return false;
-					}
-				}
-			}catch(Throwable $e){
-				return false;
-			}
-
-		}else{
-			return false;
-		}
-	}
-
 
 	public function second_auth(){
-		$id = $this->input->get('id');
+		$id = $this->input->get('workId');
 		$authkey = $this->input->get('authkey');
-		if(isset($id,$authkey)){
+	
+		if(isset($id,$authkey) == true ){
 			$data = [
-				id => $id
+				work_id => $id
 			];
 			try{
 				$query = $this->db->get_where('users',$data);
-				$final = $query->row_array();
-				if($final == !null){
+				
+				if($query == !null){
+					$final = $query->row_array();
 					$tempAuth = $final['authkey'];
+					
+					
 					if($tempAuth == $authkey){
-						$newAuthKey = random_string('alnum', 100);
+						$newAuthKey = random_string('alnum', 50);
 						$data2 = [
-							id => $id,
+							work_id => $id,
 							authkey => $authkey,
 						];
 						$this->db->set('authkey',$newAuthKey);
@@ -579,12 +269,11 @@ class ApiModel extends CI_Model
 
 						$response = [
 							res => "correct",
-							user => $final['user'],
-							id => $final['id'],
+							name => $final['name'],
+							id => $final['work_id'],
 							email => $final['email'],
 							phone => $final['phone'],
-							userkey => $final['userkey'],
-							account => $final['account'],
+							position => $final['position'],
 							authkey => $newAuthKey
 						];
 						echo json_encode($response);
@@ -662,25 +351,24 @@ class ApiModel extends CI_Model
 	
 
 	public function auth(){
-		$email  = $this->input->get("email");
+		$workId  = $this->input->get("workId");
 		$password  = $this->input->get("password");
-		
-		if(isset($email,$password)){
-			
+		if(isset($workId,$password) == true){
 			$data = [
-				'email' =>  $email,
+				'work_id' =>  $workId,
 	
 			];
 			try{
-
-				$query = $this->db->get_where('users',$data);
-				$final = $query->row_array();
-				if($final == !null){
+				$checkQ = $this->db->get_where('users',$data);
+				
+				
+				if($checkQ == !null){
+					$final = $checkQ->row_array();
 					$tempPassword = $final['password'];
 					if($tempPassword == $password){
-						$newAuthKey = random_string('alnum', 100);
+						$newAuthKey = random_string('alnum', 50);
 						$data2 = [
-							email => $email,
+							email => $workId,
 							password => $password,
 						];
 						$this->db->set('authkey',$newAuthKey);
@@ -690,7 +378,7 @@ class ApiModel extends CI_Model
 						$response = [
 							res => "correct",
 							user => $final['name'],
-							id => $final['id'],
+							id => $final['work_id'],
 							email => $final['email'],
 							phone => $final['phone'],
 							position => $final['position'],
@@ -702,6 +390,8 @@ class ApiModel extends CI_Model
 
 					}
 				
+				}else{
+					echo "hello";
 				}
 				
 				echo($results);
@@ -716,8 +406,11 @@ class ApiModel extends CI_Model
 
 
 	}
-	public function login(){
 
+	public function addEmployee(){
+		if(check_auth()){
+			echo "worked";
+		}
 	}
 }
 

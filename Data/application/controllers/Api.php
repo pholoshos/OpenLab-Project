@@ -24,10 +24,10 @@ class Api extends CI_Controller {
 		}
 
 	}
-	public function createEmployeee(){
+	public function addEmployeee(){
 		$req = $_SERVER['REQUEST_METHOD'];
 		if($req == 'GET'){
-			$this->apimodel->createEmployeee();
+			$this->apimodel->addEmployeee();
 		}
 
 	}
