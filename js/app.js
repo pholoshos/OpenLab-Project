@@ -1,4 +1,9 @@
 
+function checkData(item, limit){
+    var len = item.length;
+    return !(len < limit);
+}
+
 Vue.use(VueRouter)
 Vue.component('dashboard',{
     data : function(){
@@ -32,19 +37,55 @@ Vue.component('login',{
     data :function() {
         return{
             password : '',
-            workId : ''
+            workId : '',
+            warning : '..',
         }
     },
+
     methods: {
+        
         login : function(){
-           store.commit('doneLoading',true)
-            setTimeout(function(){
-                store.commit('doneLoading',false);
-                store.commit('login',true)
-            },1000)
+            const self = this;
+            var authUrl = 'http://localhost/OpenLab-Project/data/index.php/api/auth';
+            if(checkData(self.workId,8)&&checkData(self.password,8)){
+                try{
+                    store.commit('isLoading',true)
+                    axios.get(authUrl,{
+                        params:{
+                            workId : self.workId,
+                            password : self.password
+                        }
+                    }).then(function(response){
+                        if(response.data.res == "correct"){
+                            setTimeout(function(){
+                                store.commit('isLoading',false);
+                                store.commit('login',true)
+                            },2000)
+                        }else{
+                            //failed to login
+                            
+                            setTimeout(function(){
+                                store.commit('isLoading',false);
+                                store.commit('login',false)
+                            },1000)
+                            console.log('hello')
+                            var notification = alertify.notify('Error: check your details', '', 10, function(){  console.log('dismissed'); });
+                            
+                            
+                        }
+                    })
+    
+                }catch{
+                    var notification = alertify.notify('Error: check your internet', '', 10, function(){  console.log('dismissed'); });
+                }
+            }else{
+                var notification = alertify.notify('Error: enter a valid work id and password', '', 10, function(){  console.log('dismissed'); });
+            }
+
+        
         }
     },
-    template : '<div> <form class="col-md-6 col-10 alert log"> <h2>OpenLab</h2><p>Sign into your openlab account</p> <hr><div class="form-group"> <label for="workid">Work Id</label> <input v-model="workId" type="text" class="form-control" id="workid" aria-describedby="workid" placeholder="work id"> <small id="workid" class="form-text text-muted">enter your work id.</small> </div> <div class="form-group"><br> <label for="InputPassword1">Password</label> <input v-model="password" type="password" class="form-control" id="InputPassword1" placeholder="Password"> </div> <br><button type="button" @click="login()" class="btn btn-success">Sign in</button> </form></div>'
+    template : '<div> <form class="col-md-6 col-10 alert log"> <h2>OpenLab</h2><p>Sign into your openlab account</p> <hr> <div class="form-group"> <label for="workid">Work Id</label> <input v-model="workId" type="text" class="form-control" id="workid" aria-describedby="workid" placeholder="work id"> <small id="workid" class="form-text text-muted">enter your work id.</small> </div> <div class="form-group"><br> <label for="InputPassword1">Password</label> <input v-model="password" type="password" class="form-control" id="InputPassword1" placeholder="Password"> </div> <br><button type="button" @click="login()" class="btn btn-success">Sign in</button> </form></div>'
 })
 Vue.component('main-view',{
     template : '<div> <br><h4>Welcome to openlab</h4> <hr> <tasks></tasks></div>'
@@ -236,7 +277,7 @@ const store = new Vuex.Store({
         updateNotifications(state,value){
             state.notifications = value;
         },
-        doneLoading(state,value){
+        isLoading(state,value){
             state.loading = value;
         },
         addTitle(state,value){
@@ -261,7 +302,7 @@ var app = new Vue({
     mounted() {
         const self = this;
         setTimeout(function(){
-            store.commit('doneLoading',false);
+            store.commit('isLoading',false);
         },1000)
         
     },
