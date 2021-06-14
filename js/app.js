@@ -216,12 +216,25 @@ const store = new Vuex.Store({
     state : {
         isLoggedIn : false,
         loading : true,
-        taskTitle  : ''
+        taskTitle  : '',
+        account : null,
+        tasks : null,
+        notifications : null,
+
 
     },
     mutations : {
         login (state,value){
             state.isLoggedIn = value;
+        },
+        updateAccount(state,value){
+            state.account = value;
+        },
+        updateTasks(state,value){
+            state.tasks = value;
+        },
+        updateNotifications(state,value){
+            state.notifications = value;
         },
         doneLoading(state,value){
             state.loading = value;
