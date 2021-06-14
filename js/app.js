@@ -214,8 +214,8 @@ const router = new VueRouter({
 Vue.use(Vuex)
 const store = new Vuex.Store({
     state : {
-        isLoggedIn : true,
-        loading : false,
+        isLoggedIn : false,
+        loading : true,
         taskTitle  : ''
 
     },
