@@ -139,6 +139,7 @@ class ApiModel extends CI_Model
 							email => $final['email'],
 							phone => $final['phone'],
 							position => $final['position'],
+							position => $final['account'],
 							authkey => $newAuthKey,
 
 						];
@@ -190,9 +191,27 @@ class ApiModel extends CI_Model
 
 		if($access){
 			$data = [
-				author => $author
-
+				work_id => $this->get-input('workId')
 			];
+			$query = $this->db->get_where('user',$data);
+			$final = $query->row_array();
+			$account = $final['account'];
+			if($account == "manager"){
+				//for manager
+				$data = [
+					author => $author
+	
+				];
+			}
+			if($account == "employee"){
+				//for employee
+				$data = [
+					user => $workId
+	
+				];
+			}
+
+			
 			$query = $this->db->get_where('tasks',$data);
 			$final = $query->result();
 			$results = [
@@ -208,22 +227,31 @@ class ApiModel extends CI_Model
 		$access = $this->check_auth();
 		$workId = $this->input->get('deleteWorkId');
 		$phone = $this->input->get('phone');
+		
 		//echo $workId;
 
 		if($access && isset($workId)){
-			
-			try{
-				$data = [
-					work_id => $workId,
-				];
-				$this->db->delete('users',$data);
-				$results = [
-					res => 'correct'
-				];
-				echo json_encode($results);
-			}catch(Throwable $e){
-
+			$data = [
+				work_id => $this->get-input('workId')
+			];
+			$query = $this->db->get_where('user',$data);
+			$final = $query->row_array();
+			$account = $final['account'];
+			if($account == "manager"){
+				try{
+					$data = [
+						work_id => $workId,
+					];
+					$this->db->delete('users',$data);
+					$results = [
+						res => 'correct'
+					];
+					echo json_encode($results);
+				}catch(Throwable $e){
+	
+				}
 			}
+			
 		}
 	}
 
