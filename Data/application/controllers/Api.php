@@ -38,6 +38,13 @@ class Api extends CI_Controller {
 		}
 
 	}
+	public function deleteEmployee(){
+		$req = $_SERVER['REQUEST_METHOD'];
+		if($req == 'GET'){
+			$this->apimodel->deleteEmployee();
+		}
+
+	}
 
 
 	public function deleteTask(){

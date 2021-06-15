@@ -391,10 +391,10 @@ class ApiModel extends CI_Model
 					}
 				
 				}else{
-					echo "hello";
+					
 				}
 				
-				echo json_encode($results);
+				echo $results;
 
 			}catch(Throwable $e){
 				echo "$e";
@@ -425,6 +425,29 @@ class ApiModel extends CI_Model
 		}
 
 	}
+	public function deleteEmployee(){
+
+		$access = $this->check_auth();
+		$workId = $this->input->get('deleteWorkId');
+		$phone = $this->input->get('phone');
+		//echo $workId;
+
+		if($access && isset($workId)){
+			
+			try{
+				$data = [
+					work_id => $workId,
+				];
+				$this->db->delete('users',$data);
+				$results = [
+					res => 'correct'
+				];
+				echo json_encode($results);
+			}catch(Throwable $e){
+
+			}
+		}
+	}
 
 	public function addEmployee(){
 
@@ -449,6 +472,7 @@ class ApiModel extends CI_Model
 					position => $position,
 					password => $password,
 					work_id => $newWorkId,
+					account => "employee",
 					authkey => random_string('alnum', 50),
 					
 				];

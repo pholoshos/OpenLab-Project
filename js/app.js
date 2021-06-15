@@ -13,6 +13,11 @@ function randomString(len, charSet) {
     return randomString;
 };
 
+function selectOption (a){
+    let sel = a.options[a.selectedIndex].text;
+    return sel;
+}
+
 
 function gotResults(message) {
     setTimeout(function(){
@@ -30,6 +35,7 @@ function getCookie(name) {
     if (parts.length == 2) return parts.pop().split(";").shift();
 }
 var counter = 0;
+
 async function updateEmployees() {
     counter += 1;
     if(counter == 1){
@@ -225,16 +231,18 @@ Vue.component('view-employee',{
 
 Vue.component('delete-employee',{
     methods: {
-        delete: async function(workId){
+        deleteEmployee: async function(workId){
+            console.log(workId)
             if(checkData(workId,8)){
                 try{
-                    state.commit('isLoading',true);
+                    store.commit('isLoading',true);
                     var url = "http://localhost/OpenLab-Project/data/index.php/api/deleteEmployee";
                     await axios.get(url,{
                         params : {
                             deleteWorkId : workId,
                             workId : store.state.account.id,
-                            authkey : store.state.account.authkey
+                            authkey : store.state.account.authkey,
+                            phone : phone
                         }
                     }).then(function(response) {
                         if(response.data.res == "correct"){
@@ -251,7 +259,7 @@ Vue.component('delete-employee',{
             }
         }
     },
-    template : '<div> <h6>Delete Employee</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in $store.state.employees"> <th scope="row">{{a.work_id}}</th> <td>{{a.name}}</td><td><button class="btn btn-danger" @click="delete(a.work_id)">x</button></td> </tr> </tbody> </table> <br>  </div>'
+    template : '<div> <h6>Delete Employee</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in $store.state.employees"> <th scope="row">{{a.work_id}}</th> <td>{{a.name}}</td><td><button class="btn btn-danger" @click="deleteEmployee(a.work_id)">x</button></td> </tr> </tbody> </table> <br>  </div>'
 })
 
 
@@ -312,7 +320,17 @@ Vue.component('profile',{
 })
 
 Vue.component('creating-task',{
-    template : '<div> <br> <h4>Creating task : <div class="alert alert-secondary">{{$store.state.taskTitle}}</div></h4>  <p>Add your tasks details below</p> <hr>  <label>Task description</label> <input class="form-control"></input>  <br> <label>Employee id</label><input class="form-control" placeholder="employee"></input> <br> <button class="btn btn-success" >Create</button> <br><br></div>'
+    beforeMount(){
+        updateEmployees();
+    },
+    mounted() {
+        
+        var e = document.getElementById('employees');
+    },
+    methods: {
+        
+    },
+    template : '<div> <br> <h4>Creating task : <div class="alert alert-secondary">{{$store.state.taskTitle}}</div></h4>  <p>Add your tasks details below</p> <hr>  <label>Task description</label> <input class="form-control" placeholder="description"></input>  <br> <label>Employee id</label><select class="form-select"><option v-for="a in $store.state.employees">{{a.name}} - {{a.email}}</option> </select><br> <button class="btn btn-success" >Create</button> <br><br></div>'
 })
 
 Vue.component('nav-bar',{
@@ -462,6 +480,7 @@ var app = new Vue({
                     }).then(function(response){
                         if(response.data.res == "correct"){
                             console.log(response.data);
+                            
                             store.commit('updateAccount',response.data);
                             document.cookie = "id="+ response.data.id +"; SameSite = None; Secure";
                             document.cookie = "authkey="+ response.data.authkey +"; SameSite = None; Secure";
@@ -469,6 +488,7 @@ var app = new Vue({
                                 store.commit('isLoading',false);
                                 store.commit('login',true)
                             },2000)
+                            
                         }else{
                             //failed to login
                             store.commit('isLoading',false);
