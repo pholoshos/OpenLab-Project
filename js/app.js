@@ -13,6 +13,13 @@ function randomString(len, charSet) {
     return randomString;
 };
 
+
+function gotResults(message) {
+    setTimeout(function(){
+        store.commit('isLoading',false);
+        var notification = alertify.notify(message, '', 10, function(){  console.log('dismissed'); });
+    },1000)
+}
 function viewReset() {
     counter = 0;
 }
@@ -39,23 +46,13 @@ async function updateEmployees() {
                 if(response.data.res == "correct"){
                     counter = counter +1;
                     store.commit("updateEmployees",response.data.employees);
-                    console.log
-                    setTimeout(function(){
-                        store.commit('isLoading',false);
-                        var notification = alertify.notify('done!', '', 10, function(){  console.log('dismissed'); });
-                    },2000)
+                    gotResults('done!');
                 }else{
-                    setTimeout(function(){
-                        store.commit('isLoading',false);
-                        var notification = alertify.notify('failed to add!', '', 10, function(){  console.log('dismissed'); });
-                    },1000)  
+                    gotResults('error getting results!');
                 }
             })
         }catch{
-            setTimeout(function(){
-                store.commit('isLoading',false);
-                var notification = alertify.notify('failed added!', '', 10, function(){  console.log('dismissed'); });
-            },1000)
+            gotResults("something went wrong,try again");
     
         }
     }
@@ -120,23 +117,13 @@ Vue.component('create-employee',{
 
                     }).then(function(response){
                         if(response.data.res == "correct"){
-
-                            setTimeout(function(){
-                                store.commit('isLoading',false);
-                                var notification = alertify.notify('successfully added!', '', 10, function(){  console.log('dismissed'); });
-                            },2000)
+                            gotResults("done!");
                         }else{
-                            setTimeout(function(){
-                                store.commit('isLoading',false);
-                                var notification = alertify.notify('failed to add!', '', 10, function(){  console.log('dismissed'); });
-                            },1000)   
+                            gotResults('failed to add!');
                         }
                     })
                 }catch{
-                    setTimeout(function(){
-                        store.commit('isLoading',false);
-                        var notification = alertify.notify('failed added!', '', 10, function(){  console.log('dismissed'); });
-                    },1000)
+                    gotResults("something went wrong!");
                 }
 
             }
@@ -237,7 +224,34 @@ Vue.component('view-employee',{
 })
 
 Vue.component('delete-employee',{
-    template : '<div> <h6>Delete Employee</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in 4"> <th scope="row">1</th> <td>Mark</td><td><button class="btn btn-danger">x</button></td> </tr> </tbody> </table> <br>  </div>'
+    methods: {
+        delete: async function(workId){
+            if(checkData(workId,8)){
+                try{
+                    state.commit('isLoading',true);
+                    var url = "http://localhost/OpenLab-Project/data/index.php/api/deleteEmployee";
+                    await axios.get(url,{
+                        params : {
+                            deleteWorkId : workId,
+                            workId : store.state.account.id,
+                            authkey : store.state.account.authkey
+                        }
+                    }).then(function(response) {
+                        if(response.data.res == "correct"){
+                            store.commit('updateEmployees',response.data.employees);
+                            gotResults("done!");
+
+                        }else{
+                            gotResults("error,failed!");
+                        }
+                    })
+                }catch{
+                    gotResults("something went wrong!");
+                }
+            }
+        }
+    },
+    template : '<div> <h6>Delete Employee</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in $store.state.employees"> <th scope="row">{{a.work_id}}</th> <td>{{a.name}}</td><td><button class="btn btn-danger" @click="delete(a.work_id)">x</button></td> </tr> </tbody> </table> <br>  </div>'
 })
 
 
