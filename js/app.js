@@ -28,6 +28,9 @@ function gotResults(message) {
 function viewReset() {
     counter = 0;
 }
+function viewResetTasks() {
+    counter2 = 0;
+}
 
 function getCookie(name) {
     var value = "; " + document.cookie;
@@ -35,6 +38,7 @@ function getCookie(name) {
     if (parts.length == 2) return parts.pop().split(";").shift();
 }
 var counter = 0;
+var counter2 = 0;
 
 async function updateEmployees() {
     counter += 1;
@@ -64,6 +68,35 @@ async function updateEmployees() {
     }
     
 }
+async function updateTasks() {
+    counter2 += 1;
+    if(counter2 == 1){
+        try{
+ 
+            var url = "http://localhost/OpenLab-Project/data/index.php/api/getTasks";
+            store.commit('isLoading',true);
+            await axios.get(url,{
+                params : {
+                    workId : store.state.account.id,
+                    authkey : store.state.account.authkey,
+                    author : store.state.account.name
+                }
+            }).then(function(response){
+                if(response.data.res == "correct"){
+                    counter2 = counter2 +1;
+                    store.commit("updateTasks",response.data.tasks);
+                    gotResults('done!');
+                }else{
+                    gotResults('error getting results!');
+                }
+            })
+        }catch{
+            gotResults("something went wrong,try again");
+    
+        }
+    }
+    
+}
 Vue.use(VueRouter)
 Vue.component('dashboard',{
     data : function(){
@@ -77,7 +110,7 @@ Vue.component('dashboard',{
             router.push({ path: '/dashboard/createTask' })
         }
     },
-    template : '<div> <nav-bar></nav-bar> <br> <div class="row container"> <div class="col-md-4 tls container">  <h6>Quick tools</h6> <input class="form-control" v-model="title" placeholder="Enter your job title"></input><button class="btn btn-secondary" @click="createNewJob()">Create Job</button> <hr> <tools></tools></div> <div class="col-md-8  container"><h6> <dash-icon></dash-icon> dashboard</h6>  <router-view class="dash container"></router-view></div>  </div></div>'
+    template : '<div> <nav-bar></nav-bar> <br> <div class="row container"> <div class="col-md-4 tls container">  <h6>Quick tools</h6> <input class="form-control" v-model="title" placeholder="Enter your job title"></input><button class="btn btn-secondary" @click="createNewJob()">Create Job</button> <hr> <tools></tools></div> <div class="col-md-8 space  container"><h6> <dash-icon></dash-icon> dashboard</h6>  <router-view class="dash container"></router-view><br></div> <br> </div></div>'
 })
 Vue.component('tools-icon',{
     template : '<svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill-rule="evenodd" d="M7.875 2.292a.125.125 0 00-.032.018A7.24 7.24 0 004.75 8.25a7.247 7.247 0 003.654 6.297c.57.327.982.955.941 1.682v.002l-.317 6.058a.75.75 0 11-1.498-.078l.317-6.062v-.004c.006-.09-.047-.215-.188-.296A8.747 8.747 0 013.25 8.25a8.74 8.74 0 013.732-7.169 1.547 1.547 0 011.709-.064c.484.292.809.835.809 1.46v4.714a.25.25 0 00.119.213l2.25 1.385c.08.05.182.05.262 0l2.25-1.385a.25.25 0 00.119-.213V2.478c0-.626.325-1.169.81-1.461a1.547 1.547 0 011.708.064 8.74 8.74 0 013.732 7.17 8.747 8.747 0 01-4.41 7.598c-.14.081-.193.206-.188.296v.004l.318 6.062a.75.75 0 11-1.498.078l-.317-6.058v-.002c-.041-.727.37-1.355.94-1.682A7.247 7.247 0 0019.25 8.25a7.24 7.24 0 00-3.093-5.94.125.125 0 00-.032-.018l-.01-.001c-.003 0-.014 0-.031.01-.036.022-.084.079-.084.177V7.19a1.75 1.75 0 01-.833 1.49l-2.25 1.385a1.75 1.75 0 01-1.834 0l-2.25-1.384A1.75 1.75 0 018 7.192V2.477c0-.098-.048-.155-.084-.176a.062.062 0 00-.031-.011l-.01.001z"></path></svg>'
@@ -264,7 +297,10 @@ Vue.component('delete-employee',{
 
 
 Vue.component('tasks',{
-    template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in 3"> <div class="card "> <div class="card-header"> Send Email </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>send message to john</p> <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer> </blockquote>  <button class="btn btn-success">close job</button> </div></div> </div></div></div>'
+    beforeMount(){
+        updateTasks();
+    },
+    template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in $store.state.tasks"> <div class="card "> <div class="card-header"> {{a.title}} </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>{{a.description}}</p> <footer class="blockquote-footer">by {{a.author}}, <cite title="Source Title">for {{a.user}}.</cite></footer> </blockquote>  <button class="btn btn-success">close job</button> </div></div> </div></div></div>'
 })
 
 Vue.component('notice-view',{
@@ -323,14 +359,43 @@ Vue.component('creating-task',{
     beforeMount(){
         updateEmployees();
     },
-    mounted() {
-        
-        var e = document.getElementById('employees');
+    data : function(){
+        return{
+            description : 'default description',
+           
+        }
     },
     methods: {
-        
+        createTask : async function(){
+            const self = this;
+            viewResetTasks();
+            var e = document.getElementById('employees');
+            var employeeFor = selectOption(e);
+            var url = "http://localhost/OpenLab-Project/data/index.php/api/createTask";
+            try{
+                await axios.get(url,{
+                    params : {
+                        workId : store.state.account.id,
+                        author : store.state.account.name, 
+                        authkey : store.state.account.authkey,
+                        employeeFor : employeeFor,
+                        description : self.description,
+                        title : store.state.taskTitle,
+                        
+                    }
+                }).then(function(response){
+                    if(response.data.res == "correct"){
+                        gotResults("successfully created!");
+                    }else{
+                        gotResults('failed to create!')
+                    }
+                })
+            }catch{
+                gotResults('something bad happenned!');
+            }
+        }
     },
-    template : '<div> <br> <h4>Creating task : <div class="alert alert-secondary">{{$store.state.taskTitle}}</div></h4>  <p>Add your tasks details below</p> <hr>  <label>Task description</label> <input class="form-control" placeholder="description"></input>  <br> <label>Employee id</label><select class="form-select"><option v-for="a in $store.state.employees">{{a.name}} - {{a.email}}</option> </select><br> <button class="btn btn-success" >Create</button> <br><br></div>'
+    template : '<div> <br> <h4>Creating task : <div class="alert alert-secondary">{{$store.state.taskTitle}}</div></h4>  <p>Add your tasks details below</p> <hr>  <label>Task description</label> <input v-model="description" class="form-control" placeholder="description"></input>  <br> <label>Employee id</label><select id="employees" class="form-select"><option v-for="a in $store.state.employees">{{a.name}}</option> </select><br> <button class="btn btn-success" @click="createTask()" >Create</button> <br><br></div>'
 })
 
 Vue.component('nav-bar',{
@@ -356,6 +421,9 @@ Vue.component('info',{
 })
 
 Vue.component('manage-tasks',{
+    beforeMount(){
+        updateTasks();
+    },
     data : function(){
         return {
             view : 1
@@ -371,14 +439,14 @@ Vue.component('manage-tasks',{
 })
 
 Vue.component('delete-task',{
-    template : '<div> <h4>Delete tasks</h4> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">Task</th> <th scope="col">for</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in 4"> <th scope="row">1</th> <td>Mark</td><td><button class="btn btn-danger">x</button></td> </tr> </tbody> </table> </div>'
+    template : '<div> <h4>Delete tasks</h4> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">Task</th> <th scope="col">for</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in $store.state.tasks"> <th scope="row">{{a.title}}</th> <td>{{a.user}}</td><td><button class="btn btn-danger">x</button></td> </tr> </tbody> </table> </div>'
 })
 Vue.component('add-tasks',{
     template : '<div>add</div>'
 })
 
 Vue.component('view-task',{
-    template : '<div> <h6>viewing tasks</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">Task</th> <th scope="col">for</th><th scope="col">description</th></tr> </thead> <tbody> <tr v-for="a in 4"> <th scope="row">1</th> <td>Mark</td><td>Send email</td> </tr> </tbody> </table>  </div>'
+    template : '<div> <h6>viewing tasks</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">Task</th> <th scope="col">for</th><th scope="col">description</th></tr> </thead> <tbody> <tr v-for="a in $store.state.tasks"> <th scope="row">{{a.title}}</th> <td>{{a.user}}</td><td>{{a.description}}</td> </tr> </tbody> </table>  </div>'
 })
 
 const routes = [

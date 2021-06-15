@@ -53,11 +53,19 @@ class Api extends CI_Controller {
 			$this->apimodel->deleteTask();
 		}
 
+	
 	}
-	public function completeTask(){
+	public function getTasks(){
 		$req = $_SERVER['REQUEST_METHOD'];
 		if($req == 'GET'){
-			$this->apimodel->completeTask();
+			$this->apimodel->getTasks();
+		}
+
+	}
+	public function createTask(){
+		$req = $_SERVER['REQUEST_METHOD'];
+		if($req == 'GET'){
+			$this->apimodel->createTask();
 		}
 
 	}
