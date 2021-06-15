@@ -170,7 +170,7 @@ Vue.component('create-employee',{
             }
         }
     },
-    template : '<div>  <h4>New Employee </h4> <p>Add your tasks details below</p> <hr>  <label>Employee Name</label> <input class="form-control" v-model="name" placeholder="name"></input>  <br> <label>Email Address</label><input class="form-control" v-model="email" placeholder="email address"></input> <br><label>Password</label><input class="form-control"  placeholder="password" v-model="password"></input> <br><label>Phone number</label><input class="form-control" v-model="phone" placeholder="phone"></input> <br> <label>Work Id</label><input v-model="workId" class="form-control" placeholder="work id"></input> <br> <label>Position</label><input v-model="position" class="form-control" placeholder="position"></input> <br> <button class="btn btn-success" @click="create()">Create</button> <br><br></div>'
+    template : '<div>  <h4>New Employeeeee </h4> <p>Add your tasks details below</p> <hr>  <label>Employee Name</label> <input class="form-control" v-model="name" placeholder="name"></input>  <br> <label>Email Address</label><input class="form-control" v-model="email" placeholder="email address"></input> <br><label>Password</label><input class="form-control"  placeholder="password" v-model="password"></input> <br><label>Phone number</label><input class="form-control" v-model="phone" placeholder="phone"></input> <br> <label>Work Id</label><input v-model="workId" class="form-control" placeholder="work id"></input> <br> <label>Position</label><input v-model="position" class="form-control" placeholder="position"></input> <br> <button class="btn btn-success" @click="create()">Create</button> <br><br></div>'
 })
 
 Vue.component('login',{
