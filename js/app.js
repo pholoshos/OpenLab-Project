@@ -79,7 +79,9 @@ async function updateTasks() {
                 params : {
                     workId : store.state.account.id,
                     authkey : store.state.account.authkey,
-                    author : store.state.account.name
+                    author : store.state.account.name,
+                    name : store.state.account.id,
+
                 }
             }).then(function(response){
                 if(response.data.res == "correct"){
@@ -90,8 +92,8 @@ async function updateTasks() {
                     gotResults('error getting results!');
                 }
             })
-        }catch{
-            gotResults("something went wrong,try again");
+        }catch(err){
+            gotResults(err.message);
     
         }
     }
@@ -241,7 +243,8 @@ Vue.component('manage-employees',{
     },
     data : function(){
         return{
-            view : 1
+            view : 1,
+            accountType : 'manager'
         }
     },
     methods: {
@@ -252,7 +255,7 @@ Vue.component('manage-employees',{
         },
         
     },
-    template : '<div class="container">  <div> <br> <h4>Manage employees</h4> <button class="btn btn-secondary" @click="options(2)">Add</button> <button class="btn btn-secondary" @click="options(1)">View</button> <button class="btn btn-secondary" @click="options(3)">Delete</button>  <hr>  <view-employee v-if="view== 1"></view-employee> <create-employee v-if="view == 2"></create-employee> <delete-employee v-if="view == 3"></delete-employee>  <br></div> <br></div>'
+    template : '<div class="container" v-if="$store.state.account.account == accountType ">  <div> <br> <h4>Manage employees</h4> <button class="btn btn-secondary" @click="options(2)">Add</button> <button class="btn btn-secondary" @click="options(1)">View</button> <button class="btn btn-secondary" @click="options(3)">Delete</button>  <hr>  <view-employee v-if="view== 1"></view-employee> <create-employee v-if="view == 2"></create-employee> <delete-employee v-if="view == 3"></delete-employee>  <br></div> <br></div>'
 })
 Vue.component('view-employee',{
 
@@ -266,7 +269,7 @@ Vue.component('delete-employee',{
     methods: {
         deleteEmployee: async function(workId){
             console.log(workId)
-            if(checkData(workId,8)){
+            if(checkData(workId,7)){
                 try{
                     store.commit('isLoading',true);
                     var url = "http://localhost/OpenLab-Project/data/index.php/api/deleteEmployee";
@@ -275,7 +278,7 @@ Vue.component('delete-employee',{
                             deleteWorkId : workId,
                             workId : store.state.account.id,
                             authkey : store.state.account.authkey,
-                            phone : phone
+                            
                         }
                     }).then(function(response) {
                         if(response.data.res == "correct"){
@@ -286,8 +289,8 @@ Vue.component('delete-employee',{
                             gotResults("error,failed!");
                         }
                     })
-                }catch{
-                    gotResults("something went wrong!");
+                }catch(err){
+                    gotResults(err.message);
                 }
             }
         }
@@ -376,7 +379,7 @@ Vue.component('creating-task',{
                 await axios.get(url,{
                     params : {
                         workId : store.state.account.id,
-                        author : store.state.account.name, 
+
                         authkey : store.state.account.authkey,
                         employeeFor : employeeFor,
                         description : self.description,
