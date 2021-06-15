@@ -19,7 +19,7 @@ class ApiModel extends CI_Model
 	public function check_auth(){
 		$id = $this->input->get("workId");
 		$authkey = $this->input->get("authkey");
-		echo $authkey;
+		
 		if(isset($id,$authkey)){
 			$data = [
 				work_id => $id
@@ -394,7 +394,7 @@ class ApiModel extends CI_Model
 					echo "hello";
 				}
 				
-				echo($results);
+				echo json_encode($results);
 
 			}catch(Throwable $e){
 				echo "$e";
@@ -406,10 +406,62 @@ class ApiModel extends CI_Model
 
 
 	}
+	public function getEmployees(){
+
+		$access =  $this->check_auth();
+
+		if($access){
+			$data = [
+				account => 'employee'
+
+			];
+			$query = $this->db->get_where('users',$data);
+			$final = $query->result();
+			$results = [
+				employees => $final,
+				res => "correct"
+			];
+			echo json_encode($results);
+		}
+
+	}
 
 	public function addEmployee(){
-		if(check_auth()){
-			echo "worked";
+
+
+		$name = $this->input->get("name");
+		$position  = $this->input->get("position");
+		$newWorkId = $this->input->get("accountWorkId");
+		$password = $this->input->get("password");
+		$email = $this->input->get("email");
+		$phone = $this->input->get("phone");
+
+
+
+
+		$access =  $this->check_auth();
+		if(isset($name,$password,$position,$email,$phone,$newWorkId) && $access){
+			try{
+				$data = [
+					name => $name,
+					phone => $phone,
+					email => $email,
+					position => $position,
+					password => $password,
+					work_id => $newWorkId,
+					authkey => random_string('alnum', 50),
+					
+				];
+				$this->db->insert('users',$data);
+				$myResults = [
+					res => "correct"
+				];
+				echo json_encode($myResults);
+
+			}catch(Throwable $e){
+				echo $e;
+			}
+
 		}
 	}
 }

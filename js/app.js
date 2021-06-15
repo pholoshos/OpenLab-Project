@@ -3,13 +3,64 @@ function checkData(item, limit){
     var len = item.length;
     return !(len < limit);
 }
+function randomString(len, charSet) {
+    charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var randomString = '';
+    for (var i = 0; i < len; i++) {
+        var randomPoz = Math.floor(Math.random() * charSet.length);
+        randomString += charSet.substring(randomPoz,randomPoz+1);
+    }
+    return randomString;
+};
+
+function viewReset() {
+    counter = 0;
+}
 
 function getCookie(name) {
     var value = "; " + document.cookie;
     var parts = value.split("; " + name + "=");
     if (parts.length == 2) return parts.pop().split(";").shift();
-  }
-
+}
+var counter = 0;
+async function updateEmployees() {
+    counter += 1;
+    if(counter == 1){
+        try{
+ 
+            var url = "http://localhost/OpenLab-Project/data/index.php/api/getEmployees";
+            store.commit('isLoading',true);
+            await axios.get(url,{
+                params : {
+                    workId : store.state.account.id,
+                    authkey : store.state.account.authkey
+                }
+            }).then(function(response){
+                if(response.data.res == "correct"){
+                    counter = counter +1;
+                    store.commit("updateEmployees",response.data.employees);
+                    console.log
+                    setTimeout(function(){
+                        store.commit('isLoading',false);
+                        var notification = alertify.notify('done!', '', 10, function(){  console.log('dismissed'); });
+                    },2000)
+                }else{
+                    setTimeout(function(){
+                        store.commit('isLoading',false);
+                        var notification = alertify.notify('failed to add!', '', 10, function(){  console.log('dismissed'); });
+                    },1000)  
+                }
+            })
+        }catch{
+            setTimeout(function(){
+                store.commit('isLoading',false);
+                var notification = alertify.notify('failed added!', '', 10, function(){  console.log('dismissed'); });
+            },1000)
+    
+        }
+    }
+    
+}
 Vue.use(VueRouter)
 Vue.component('dashboard',{
     data : function(){
@@ -38,12 +89,12 @@ Vue.component('loading-item',{
 Vue.component('create-employee',{
     data : function(){
         return{
-            phone : '',
-            email : '',
-            password  : '',
-            workId : '',
-            position : '',
-            name : ''
+            phone : '0720648709',
+            email : 'example@email.com',
+            password  : '12345678',
+            workId : randomString(10),
+            position : 'worker',
+            name : 'default name'
         }
     },
     methods: {
@@ -53,7 +104,7 @@ Vue.component('create-employee',{
             if(check == true){
                 try{
                     store.commit('isLoading',true);
-                    var createUrl = "";
+                    var createUrl = "http://localhost/OpenLab-Project/data/index.php/api/addEmployee";
                     await axios.get(createUrl,{
                         params : {
                             phone : self.phone,
@@ -61,14 +112,31 @@ Vue.component('create-employee',{
                             password : self.password,
                             position : self.position,
                             name : self.name,
-                            workId : self.workId
+                            accountWorkId : self.workId,
+                            workId : store.state.account.id,
+                            authkey : store.state.account.authkey
+                            
                         }
 
                     }).then(function(response){
-                        
+                        if(response.data.res == "correct"){
+
+                            setTimeout(function(){
+                                store.commit('isLoading',false);
+                                var notification = alertify.notify('successfully added!', '', 10, function(){  console.log('dismissed'); });
+                            },2000)
+                        }else{
+                            setTimeout(function(){
+                                store.commit('isLoading',false);
+                                var notification = alertify.notify('failed to add!', '', 10, function(){  console.log('dismissed'); });
+                            },1000)   
+                        }
                     })
                 }catch{
-
+                    setTimeout(function(){
+                        store.commit('isLoading',false);
+                        var notification = alertify.notify('failed added!', '', 10, function(){  console.log('dismissed'); });
+                    },1000)
                 }
 
             }
@@ -142,6 +210,9 @@ Vue.component('main-view',{
 })
 
 Vue.component('manage-employees',{
+    mounted() {
+        updateEmployees();
+    },
     data : function(){
         return{
             view : 1
@@ -149,6 +220,7 @@ Vue.component('manage-employees',{
     },
     methods: {
         options : function(i){
+            viewReset();
             const self = this;
             self.view  = i;
         },
@@ -157,7 +229,11 @@ Vue.component('manage-employees',{
     template : '<div class="container">  <div> <br> <h4>Manage employees</h4> <button class="btn btn-secondary" @click="options(2)">Add</button> <button class="btn btn-secondary" @click="options(1)">View</button> <button class="btn btn-secondary" @click="options(3)">Delete</button>  <hr>  <view-employee v-if="view== 1"></view-employee> <create-employee v-if="view == 2"></create-employee> <delete-employee v-if="view == 3"></delete-employee>  <br></div> <br></div>'
 })
 Vue.component('view-employee',{
-    template : '<div><table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th> <th scope="col">Phone</th> <th scope="col">email address</th> </tr> </thead> <tbody> <tr v-for="a in 4"> <th scope="row">1</th> <td>Mark</td> <td>Otto</td> <td>@mdo</td> </tr> </tbody> </table></div>'
+
+    methods: {
+   
+    },
+    template : '<div><table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th> <th scope="col">Phone</th> <th scope="col">email address</th> </tr> </thead> <tbody> <tr v-for="a in $store.state.employees"> <th scope="row">{{a.work_id}}</th> <td>{{a.name}}</td> <td>{{a.phone}}</td> <td>{{a.email}}</td> </tr> </tbody> </table></div>'
 })
 
 Vue.component('delete-employee',{
@@ -322,6 +398,7 @@ const store = new Vuex.Store({
         account : null,
         tasks : null,
         notifications : null,
+        employees : null,
 
 
     },
@@ -331,6 +408,9 @@ const store = new Vuex.Store({
         },
         updateAccount(state,value){
             state.account = value;
+        },
+        updateEmployees(state,value){
+            state.employees = value;
         },
         updateTasks(state,value){
             state.tasks = value;

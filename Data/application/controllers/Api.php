@@ -24,13 +24,21 @@ class Api extends CI_Controller {
 		}
 
 	}
-	public function addEmployeee(){
+	public function addEmployee(){
 		$req = $_SERVER['REQUEST_METHOD'];
 		if($req == 'GET'){
-			$this->apimodel->addEmployeee();
+			$this->apimodel->addEmployee();
 		}
 
 	}
+	public function getEmployees(){
+		$req = $_SERVER['REQUEST_METHOD'];
+		if($req == 'GET'){
+			$this->apimodel->getEmployees();
+		}
+
+	}
+
 
 	public function deleteTask(){
 		$req = $_SERVER['REQUEST_METHOD'];
@@ -69,14 +77,6 @@ class Api extends CI_Controller {
 			$this->apimodel->userDetails();
 		}
 	}
-
-	public function userReq2(){
-		$req = $_SERVER['REQUEST_METHOD'];
-		if($req == 'GET'){
-			$this->apimodel->userReq2();
-		}
-	}
-	//coins on sale
 
 	public function second_auth(){
 		$req = $_SERVER['REQUEST_METHOD'];
