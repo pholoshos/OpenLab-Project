@@ -1,5 +1,5 @@
 # OpenLab-Project
-This is a final year project titled OPENLAb
+This is a project titled OPENLAb
 ***Enjoy!***
 https://openlabproject.000webhostapp.com/
 
