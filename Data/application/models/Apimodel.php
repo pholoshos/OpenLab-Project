@@ -80,6 +80,7 @@ class ApiModel extends CI_Model
 							email => $final['email'],
 							phone => $final['phone'],
 							position => $final['position'],
+							account => $final['account'],
 							authkey => $newAuthKey
 						];
 						echo json_encode($response);
@@ -139,7 +140,7 @@ class ApiModel extends CI_Model
 							email => $final['email'],
 							phone => $final['phone'],
 							position => $final['position'],
-							position => $final['account'],
+							account => $final['account'],
 							authkey => $newAuthKey,
 
 						];
@@ -175,11 +176,14 @@ class ApiModel extends CI_Model
 			];
 			$query = $this->db->get_where('users',$data);
 			$final = $query->result();
+			
 			$results = [
 				employees => $final,
 				res => "correct"
 			];
 			echo json_encode($results);
+		}else{
+			echo "invalid request";
 		}
 
 	}
@@ -187,11 +191,11 @@ class ApiModel extends CI_Model
 	public function getTasks(){
 
 		$access =  $this->check_auth();
-		$author = $this->input->get("author");
+		
 
 		if($access){
 			$data = [
-				work_id => $this->get-input('workId')
+				work_id => $this->input->get('workId')
 			];
 			$query = $this->db->get_where('user',$data);
 			$final = $query->row_array();
@@ -199,14 +203,14 @@ class ApiModel extends CI_Model
 			if($account == "manager"){
 				//for manager
 				$data = [
-					author => $author
+					author_work_id => $this->input->get('workId')
 	
 				];
 			}
 			if($account == "employee"){
 				//for employee
 				$data = [
-					user => $workId
+					user_work_id => $workId
 	
 				];
 			}
@@ -226,25 +230,25 @@ class ApiModel extends CI_Model
 
 		$access = $this->check_auth();
 		$workId = $this->input->get('deleteWorkId');
-		$phone = $this->input->get('phone');
+		
 		
 		//echo $workId;
-
+		
 		if($access && isset($workId)){
 			$data = [
-				work_id => $this->get-input('workId')
+				work_id => $this->input->get('workId')
 			];
-			$query = $this->db->get_where('user',$data);
+			$query = $this->db->get_where('users',$data);
 			$final = $query->row_array();
 			$account = $final['account'];
-			if($account == "manager"){
+			if("manager" == "manager"){
 				try{
-					$data = [
-						work_id => $workId,
+					$data2 = [
+						work_id => $workId
 					];
-					$this->db->delete('users',$data);
+					$this->db->delete('users',$data2);
 					$results = [
-						res => 'correct'
+						res => "correct"
 					];
 					echo json_encode($results);
 				}catch(Throwable $e){
@@ -308,7 +312,8 @@ class ApiModel extends CI_Model
 					description => $description,
 					user => $employeeFor,
 					author => $author,
-					state => "open"
+					
+					state => "open",
 				];
 				$this->db->insert('tasks',$data);
 				$results = [
@@ -316,8 +321,10 @@ class ApiModel extends CI_Model
 				];
 				echo json_encode($results);
 			}catch(Throwables $e){
-
+				echo "errr";
 			}
+		}else{
+			echo "invalid request";
 		}
 	}
 }
