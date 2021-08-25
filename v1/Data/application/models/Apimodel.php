@@ -194,10 +194,10 @@ class ApiModel extends CI_Model
 		
 
 		if($access){
-			$data = [
+			$data2 = [
 				work_id => $this->input->get('workId')
 			];
-			$query = $this->db->get_where('user',$data);
+			$query = $this->db->get_where('users',$data2);
 			$final = $query->row_array();
 			$account = $final['account'];
 			if($account == "manager"){
@@ -217,9 +217,9 @@ class ApiModel extends CI_Model
 
 			
 			$query = $this->db->get_where('tasks',$data);
-			$final = $query->result();
+			$final2 = $query->result();
 			$results = [
-				tasks => $final,
+				tasks => $final2,
 				res => "correct"
 			];
 			echo json_encode($results);
