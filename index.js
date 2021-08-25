@@ -7,9 +7,23 @@ const path = require('path');
 app = express();
 
 
-//routes for account related stuff
+//routes  related stuff
 const accountRoute = require('./routes/account')
 app.use('/account',accountRoute)
+
+const tasksRoute = require('./routes/tasks')
+app.use('/task',tasksRoute)
+
+const authRoute = require('./routes/auth')
+app.use('/auth',authRoute)
+
+const usersRoute = require('./routes/users')
+app.use('/users',usersRoute)
+
+const notificationRoute = require('./routes/notifications')
+app.use('/notifications',notificationRoute)
+
+
 
 //serve the html pages
 app.use(serveStatic(path.join(__dirname, 'dist')))
