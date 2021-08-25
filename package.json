@@ -7,6 +7,9 @@
     "start": "nodemon index.js",
     "postinstall": "npm run build"
   },
+  "engines": {
+    "node": "14.17.0"
+  },
   "author": "pholosho seloane",
   "license": "MIT",
   "dependencies": {
