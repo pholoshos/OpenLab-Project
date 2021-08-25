@@ -1,0 +1,58 @@
+@keyframes ldio-o5ixvig4g1g {
+  0% { transform: rotate(0deg) }
+  100% { transform: rotate(360deg) }
+}
+.ldio-o5ixvig4g1g > div > div {
+  transform-origin: 100px 100px;
+  animation: ldio-o5ixvig4g1g 3.0303030303030303s linear infinite;
+  opacity: 0.8
+}
+.ldio-o5ixvig4g1g > div > div > div {
+  position: absolute;
+  left: 30px;
+  top: 30px;
+  width: 70px;
+  height: 70px;
+  border-radius: 70px 0 0 0;
+  transform-origin: 100px 100px
+}.ldio-o5ixvig4g1g > div div:nth-child(1) {
+  animation-duration: 0.7575757575757576s
+}
+.ldio-o5ixvig4g1g > div div:nth-child(1) > div {
+  background: #41ad3d;
+  transform: rotate(0deg);
+}.ldio-o5ixvig4g1g > div div:nth-child(2) {
+  animation-duration: 1.0101010101010102s
+}
+.ldio-o5ixvig4g1g > div div:nth-child(2) > div {
+  background: #4d4f53;
+  transform: rotate(0deg);
+}.ldio-o5ixvig4g1g > div div:nth-child(3) {
+  animation-duration: 1.5151515151515151s
+}
+.ldio-o5ixvig4g1g > div div:nth-child(3) > div {
+  background: #41ad3d;
+  transform: rotate(0deg);
+}.ldio-o5ixvig4g1g > div div:nth-child(4) {
+  animation-duration: 3.0303030303030303s
+}
+.ldio-o5ixvig4g1g > div div:nth-child(4) > div {
+  background: #4d4f53;
+  transform: rotate(0deg);
+}
+.loadingio-spinner-wedges-ur68tkkzkum {
+  width: 200px;
+  height: 200px;
+  display: inline-block;
+  overflow: hidden;
+  background: #f1f2f3;
+}
+.ldio-o5ixvig4g1g {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform: translateZ(0) scale(1);
+  backface-visibility: hidden;
+  transform-origin: 0 0; /* see note above */
+}
+.ldio-o5ixvig4g1g div { box-sizing: content-box; }
