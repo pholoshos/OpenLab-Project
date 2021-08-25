@@ -1,5 +1,9 @@
-# openlab
+# openlab Project
 
+**have made some changes on the project,**
+we are now hosting on a nodejs server, will only javascript language in our project, and mongodb database.
+
+not much has changed on the frontend part,
 ## Project setup
 ```
 npm install
@@ -7,18 +11,6 @@ npm install
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+npm start
 ```
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
