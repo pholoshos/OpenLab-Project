@@ -4,7 +4,7 @@ const random = require('../logic/random');
 
 
 const UserSchema = mongoose.Schema({
-    username : {
+    name : {
         type : String,
         lowercase: true,
         required : true,
@@ -13,8 +13,10 @@ const UserSchema = mongoose.Schema({
         required : true,
         type : String
     },
-    name : {
-        required : true,
+
+    status : {
+        required : false,
+        default : 'not set',
         type : String,
     },
     password : {

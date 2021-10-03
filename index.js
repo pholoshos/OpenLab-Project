@@ -6,6 +6,8 @@ const serveStatic = require("serve-static")
 const path = require('path');
 app = express();
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 //routes  related stuff
 const accountRoute = require('./routes/account')
@@ -29,9 +31,13 @@ app.use('/notifications',notificationRoute)
 app.use(serveStatic(path.join(__dirname, 'dist')))
 
 //connect to database
-mongoose.connect(process.env.DB_CONNECTION,{ useNewUrlParser: true },()=>{
-    console.log('connected');
-});
+mongoose.connect(process.env.DB_CONNECTION,{
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,   })   
+.then(() => console.log("Database connected!"))
+.catch(err => console.log(err));
+
 
 //get the port number
 const port = process.env.PORT || 3000;
