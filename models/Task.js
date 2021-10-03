@@ -5,9 +5,17 @@ const TasksSchema = mongoose.Schema({
         type : String,
         required : true,
     },
+    authorName : {
+        type : String,
+        default : ' '
+    },
     author : {
         type : String,
         required : true,
+    },
+    account : {
+        type : String,
+        default : 'user',
     },
     recipient : {
         type : String,
