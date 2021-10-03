@@ -28,5 +28,19 @@ router.post('/create',(req,res)=>{
         }
     })
 })
+router.get('/all',(req,res)=>{
+   const data = {
+       
+   }
+});
+
+router.get('/department',(req,res)=>{
+   
+});
+
+router.get('/position',(req,res)=>{
+   
+});
+
 
 module.exports = router;
