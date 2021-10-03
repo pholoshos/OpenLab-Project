@@ -41,7 +41,7 @@ router.post('/new',(req,res)=>{
         position : 'admin'
     }
     User.exists(data,(err,userFound)=>{
-        if(err){
+        if(err && !userFound){
             res.json(500).json('error!');
         }else{
             const task = new Task({
@@ -55,7 +55,7 @@ router.post('/new',(req,res)=>{
             })
             Task.create(task,(err,task)=>{
                 if(err){
-                    res.status(500).json("error");
+                    res.status(500).json(err);
                 }else{
                     res.json({results : 'done'})
                 }
