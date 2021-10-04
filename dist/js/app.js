@@ -45,17 +45,17 @@ async function updateEmployees() {
     if(counter == 1){
         try{
  
-            var url = "http://localhost/OpenLab-Project/data/index.php/api/getEmployees";
+            var url = "http://localhost:3000/account/all/";
             store.commit('isLoading',true);
-            await axios.get(url,{
-                params : {
-                    workId : store.state.account.id,
+            await axios.post(url,{
+                  
+                    _id : store.state.account._id,
                     authkey : store.state.account.authkey
-                }
+                
             }).then(function(response){
-                if(response.data.res == "correct"){
+                if(response.data){
                     counter = counter +1;
-                    store.commit("updateEmployees",response.data.employees);
+                    store.commit("updateEmployees",response.data);
                     gotResults('done!');
                 }else{
                     gotResults('error getting results!');
@@ -72,19 +72,22 @@ async function updateTasks() {
     counter2 += 1;
     if(counter2 == 1){
         try{
- 
-            var url = "http://localhost/OpenLab-Project/data/index.php/api/getTasks";
+            var url = "";
+            if(store.state.account.account == "admin"){
+                url = "http://localhost:3000/task/admin/";
+            }else{
+                url = "http://localhost:3000/task/all/"; 
+            }
+            
             store.commit('isLoading',true);
             await axios.get(url,{
                 params : {
-                    workId : store.state.account.id,
+                    _id : store.state.account._id,
                     authkey : store.state.account.authkey,
-                    author : store.state.account.name,
-                    name : store.state.account.id,
 
                 }
             }).then(function(response){
-                if(response.data.res == "correct"){
+                if(response.data){
                     counter2 = counter2 +1;
                     store.commit("updateTasks",response.data.tasks);
                     gotResults('done!');
@@ -104,7 +107,7 @@ Vue.component('dashboard',{
     data : function(){
         return{
             title : '',
-            account : 'manager'
+            account : 'admin'
         }
     },
     methods: {
@@ -133,7 +136,8 @@ Vue.component('create-employee',{
             password  : '12345678',
             workId : randomString(10),
             position : 'worker',
-            name : 'default name'
+            name : 'default name',
+            department : 'general'
         }
     },
     methods: {
@@ -143,22 +147,24 @@ Vue.component('create-employee',{
             if(check == true){
                 try{
                     store.commit('isLoading',true);
-                    var createUrl = "http://localhost/OpenLab-Project/data/index.php/api/addEmployee";
-                    await axios.get(createUrl,{
-                        params : {
+                    var createUrl = "http://localhost:3000/account/create/";
+                    await axios.post(createUrl,{
+                        
                             phone : self.phone,
-                            email : self.email,
+                            emailAddress : self.email,
+                            department : self.department,
+
                             password : self.password,
                             position : self.position,
                             name : self.name,
-                            accountWorkId : self.workId,
-                            workId : store.state.account.id,
+                            workId : self.workId,
+                            _id : store.state.account._id,
                             authkey : store.state.account.authkey
                             
-                        }
+                        
 
                     }).then(function(response){
-                        if(response.data.res == "correct"){
+                        if(response.data){
                             gotResults("done!");
                         }else{
                             gotResults('failed to add!');
@@ -171,7 +177,7 @@ Vue.component('create-employee',{
             }
         }
     },
-    template : '<div>  <h4>New Employee </h4> <p>Add your tasks details below</p> <hr>  <label>Employee Name</label> <input class="form-control" v-model="name" placeholder="name"></input>  <br> <label>Email Address</label><input class="form-control" v-model="email" placeholder="email address"></input> <br><label>Password</label><input class="form-control"  placeholder="password" v-model="password"></input> <br><label>Phone number</label><input class="form-control" v-model="phone" placeholder="phone"></input> <br> <label>Work Id</label><input v-model="workId" class="form-control" placeholder="work id"></input> <br> <label>Position</label><input v-model="position" class="form-control" placeholder="position"></input> <br> <button class="btn btn-success" @click="create()">Create</button> <br><br></div>'
+    template : '<div>  <h4>New Employee </h4> <p>Add your tasks details below</p> <hr>  <label>Employee Name</label> <input class="form-control" v-model="name" placeholder="name"></input>  <br> <label>Email Address</label><input class="form-control" v-model="email" placeholder="email address"></input>  <br> <label>department</label><input class="form-control" v-model="department" placeholder="department name"></input>   <br><label>Password</label><input class="form-control"  placeholder="password" v-model="password"></input> <br><label>Phone number</label><input class="form-control" v-model="phone" placeholder="phone"></input> <br> <label>Work Id</label><input v-model="workId" class="form-control" placeholder="work id"></input> <br> <label>Position</label><input v-model="position" class="form-control" placeholder="position"></input> <br> <button class="btn btn-success" @click="create()">Create</button> <br><br></div>'
 })
 
 Vue.component('login',{
@@ -180,7 +186,7 @@ Vue.component('login',{
             password : '',
             workId : '',
             warning : '..',
-            authUrl : 'https://openlabprojects.herokuapp.com/auth/login/'
+            authUrl : 'http://localhost:3000/auth/login/'
         }
     },
     mounted() {
@@ -194,10 +200,9 @@ Vue.component('login',{
                 try{
                     store.commit('isLoading',true)
                     await axios.post(self.authUrl,{
-                        data:{
                             workId : self.workId,
                             password : self.password
-                        }
+                        
                     }).then(function(response){
                         if(response.data != null){
                             console.log(response.data);
@@ -245,7 +250,7 @@ Vue.component('manage-employees',{
     data : function(){
         return{
             view : 1,
-            accountType : 'manager'
+            accountType : 'admin'
         }
     },
     methods: {
@@ -263,7 +268,7 @@ Vue.component('view-employee',{
     methods: {
    
     },
-    template : '<div><table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th> <th scope="col">Phone</th> <th scope="col">email address</th> </tr> </thead> <tbody> <tr v-for="a in $store.state.employees"> <th scope="row">{{a.work_id}}</th> <td>{{a.name}}</td> <td>{{a.phone}}</td> <td>{{a.email}}</td> </tr> </tbody> </table></div>'
+    template : '<div><table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th> <th scope="col">Phone</th> <th scope="col">email address</th> </tr> </thead> <tbody> <tr v-for="a in $store.state.employees"> <th scope="row">{{a.workId}}</th> <td>{{a.name}}</td> <td>{{a.phone}}</td> <td>{{a.emailAddress}}</td> </tr> </tbody> </table></div>'
 })
 
 Vue.component('delete-employee',{
@@ -296,7 +301,7 @@ Vue.component('delete-employee',{
             }
         }
     },
-    template : '<div> <h6>Delete Employee</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in $store.state.employees"> <th scope="row">{{a.work_id}}</th> <td>{{a.name}}</td><td><button class="btn btn-danger" @click="deleteEmployee(a.work_id)">x</button></td> </tr> </tbody> </table> <br>  </div>'
+    template : '<div> <h6>Delete Employee</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in $store.state.employees"> <th scope="row">{{a.workId}}</th> <td>{{a.name}}</td><td><button class="btn btn-danger" @click="deleteEmployee(a.work_id)">x</button></td> </tr> </tbody> </table> <br>  </div>'
 })
 
 
@@ -366,11 +371,15 @@ Vue.component('profile',{
     data : function(){
         return{
             account : store.state.account.name,
-            email : store.state.account.email,
-            phone : store.state.account.phone
+            email : store.state.account.emailAddress,
+            phone : store.state.account.phone,
+            status : store.state.account.status,
+            position : store.state.account.position,
+            department : store.state.account.department,
+            workId : store.state.account.workId
         }
     },
-    template : '<div><br> <h4>Profile</h4> <hr> <p>Account name : {{account}}</p> <p>Email address: {{email}}</p> <p>Phone Number : {{phone}}</p> <br> <br><br></div>'
+    template : '<div><br> <h4>Profile</h4> <hr><p>Status : {{status}}</p> <p>Account name : {{account}}</p> <p>Email address: {{email}}</p> <p>Department : {{department}}</p> <p>Phone Number : {{phone}}</p> <p>Position : {{position}}</p>  <br> <br><br></div>'
 })
 
 Vue.component('creating-task',{
@@ -380,44 +389,62 @@ Vue.component('creating-task',{
     data : function(){
         return{
             description : 'default description',
+            selectedEmployee : null,
            
         }
     },
     methods: {
+        selectPerson : function(a){
+            const self = this;
+            self.selectedEmployee = a;
+            console.log(a.name);
+        },
         createTask : async function(){
             const self = this;
             viewResetTasks();
-            var e = document.getElementById('employees');
-            var employeeFor = selectOption(e);
-            var url = "http://localhost/OpenLab-Project/data/index.php/api/createTask";
+            
+            var url = "http://localhost:3000/task/new/";
             try{
-                await axios.get(url,{
-                    params : {
-                        workId : store.state.account.id,
-
+                await axios.post(url,{
+                    
+                        _id : store.state.account._id,
                         authkey : store.state.account.authkey,
-                        employeeFor : employeeFor,
+                        recipientName : self.selectedEmployee.name,
+                        recipient : self.selectedEmployee._id,
+                        author : store.state.account._id,
+                        authorName : store.state.account.name,
                         description : self.description,
                         title : store.state.taskTitle,
                         
-                    }
+                    
                 }).then(function(response){
-                    if(response.data.res == "correct"){
+                    if(response.data){
                         gotResults("successfully created!");
                     }else{
                         gotResults('failed to create!')
                     }
                 })
-            }catch{
+            }catch(e){
                 gotResults('something bad happenned!');
+                console.log(e);
             }
         }
     },
-    template : '<div> <br> <h4>Creating task : <div class="alert alert-secondary">{{$store.state.taskTitle}}</div></h4>  <p>Add your tasks details below</p> <hr>  <label>Task description</label> <input v-model="description" class="form-control" placeholder="description"></input>  <br> <label>Employee id</label><select id="employees" class="form-select"><option v-for="a in $store.state.employees">{{a.name}}</option> </select><br> <button class="btn btn-success" @click="createTask()" >Create</button> <br><br></div>'
+    template : '<div> <br> <h4>Creating task : <div class="alert alert-secondary">{{$store.state.taskTitle}}</div></h4>  <p>Add your tasks details below</p> <hr>  <label>Task description</label> <input v-model="description" class="form-control" placeholder="description"></input>  <br> <label>Employee id</label><select id="employees" class="form-select"><option  v-for="a in $store.state.employees" @click="selectPerson(a)">{{a.name}}</option> </select><br> <button class="btn btn-success" @click="createTask()" >Create</button> <br><br></div>'
 })
 
 Vue.component('nav-bar',{
-    template : '<div>    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> <div class="container-fluid"> <router-link class="navbar-brand" to="/dashboard/home" >OpenLab</router-link> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="navbarNav"> <ul class="navbar-nav"> <li class="nav-item"> <router-link class="navbar-brand" to="/dashboard/profile" >Profile</router-link> </li> </ul> </div> </div> </nav></div>'
+    data : function(){
+        return{
+            status : store.state.account.status
+        }
+    },
+    methods : {
+        changeStatus : function(){
+            
+        }
+    },
+    template : '<div>    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> <div class="container-fluid"> <router-link class="navbar-brand" to="/dashboard/home" >OpenLab</router-link> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="navbarNav"> <ul class="navbar-nav"> <li class="nav-item"> <router-link class="ln" to="/dashboard/profile" >Profile</router-link> </li> <li class=" navbar-item" @press="">change Status({{status}})</li></ul> </div> </div> </nav></div>'
 })
 
 Vue.component('landing-page',{
@@ -555,20 +582,20 @@ var app = new Vue({
     },
     methods: {
         login2 : async function() {
-            if(getCookie("authkey",8)){
+            if(getCookie("authkey").length >2){
                 try{
                     store.commit('isLoading',true)
-                    await axios.get("http://localhost/OpenLab-Project/data/index.php/api/second_auth",{
-                        params:{
+                    await axios.post("http://localhost:3000/auth/",{
+                        
                             authkey : getCookie("authkey"),
-                            workId : getCookie("id")
-                        }
+                            _id : getCookie("id")
+                       
                     }).then(function(response){
-                        if(response.data.res == "correct"){
+                        if(response.data != null){
                             console.log(response.data);
                             
                             store.commit('updateAccount',response.data);
-                            document.cookie = "id="+ response.data.id +"; SameSite = None; Secure";
+                            document.cookie = "id="+ response.data._id +"; SameSite = None; Secure";
                             document.cookie = "authkey="+ response.data.authkey +"; SameSite = None; Secure";
                             setTimeout(function(){
                                 store.commit('isLoading',false);

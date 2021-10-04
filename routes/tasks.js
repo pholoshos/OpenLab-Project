@@ -9,7 +9,7 @@ router.get('/',(req,res)=>{
     res.send('get');
 });
 
-router.get('/all',(req,res)=>{
+router.post('/all',(req,res)=>{
     const data = {
         authkey  : req.body.authkey,
         _id: req.body._id
@@ -19,6 +19,30 @@ router.get('/all',(req,res)=>{
             const taskData = {
                 recipient : req.body._id,
                 status :  req.body.status,
+            }
+            Task.find(taskData,(err,tasks)=>{
+                if(!err){
+                    res.json(tasks);
+                }else{
+                    res.status(500).json("error");
+                }
+            })
+        }else{
+            res.status(500).json('eror');
+        }
+    })
+});
+
+router.post('/admin',(req,res)=>{
+    const data = {
+        authkey  : req.body.authkey,
+        _id: req.body._id
+    }
+    User.exists(data,(err,foundUser)=>{
+        if(!err && foundUser){
+            const taskData = {
+                author : req.body._id,
+                
             }
             Task.find(taskData,(err,tasks)=>{
                 if(!err){

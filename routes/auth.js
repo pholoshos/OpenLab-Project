@@ -55,7 +55,7 @@ const check = async (data,op,res)=>{
                      })
                   
                  }
-                 User.findOne(data,'workId name authkey emailAddress phone department position _id',(err,user)=>{
+                 User.findOne(data,'workId name authkey emailAddress account status phone department position _id',(err,user)=>{
                      if(err){
                          res.status(500).json('something went wrong');
                          return false;
