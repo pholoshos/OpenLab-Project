@@ -24,12 +24,13 @@ router.post('/create',(req,res)=>{
                 department : req.body.department,
                 password : req.body.password,
                 name : req.body.name,
+                account : "user"
                 
             })
         
             User.create(user,(err,user)=>{
                 if(err){
-                    res.status(404).json('user not found: '+err);
+                    res.status(404).json('error: '+err);
                 }else{
                     res.json({mess : 'done!'})
                 }
@@ -40,10 +41,11 @@ router.post('/create',(req,res)=>{
     })
 
 })
-router.get('/all',(req,res)=>{
+router.post('/all',(req,res)=>{
     const data = {
+        _id : req.body._id,
         authkey  : req.body.authkey,
-        _id: req.body._id
+        
     }
     User.exists(data,(err,foundUser)=>{
         if(!err && foundUser){
@@ -51,11 +53,11 @@ router.get('/all',(req,res)=>{
                 if(!err){
                     res.json(accounts);
                 }else{
-                    res.status(500).json('error')
+                    res.status(500).json(err)
                 }
             })
         }else{
-            res.status(500).json('error')
+            res.status(500).json(foundUser +" - for: "+data._id+" .")
         }
     })
 
@@ -71,7 +73,7 @@ router.get('/department',(req,res)=>{
             const newData = {
                 department : req.body.department
             }
-            User.find(newData,'emailAddress position department name workId phone status',(err,accounts)=>{
+            User.find(newData,'emailAddress position department name workId status  phone ',(err,accounts)=>{
                 if(!err){
                     res.json(accounts);
                 }else{
