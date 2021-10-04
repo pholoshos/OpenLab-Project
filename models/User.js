@@ -13,6 +13,11 @@ const UserSchema = mongoose.Schema({
         required : true,
         type : String
     },
+    account : {
+        default : 'user',
+        type : String,
+
+    },
 
     status : {
         required : false,
