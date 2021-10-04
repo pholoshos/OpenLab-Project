@@ -1,10 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+var cors = require('cors');
 require('dotenv/config');
+
 const serveStatic = require("serve-static")
+
 const path = require('path');
 app = express();
+app.use(cors({
+    origin: '*'
+}));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

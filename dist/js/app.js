@@ -180,7 +180,7 @@ Vue.component('login',{
             password : '',
             workId : '',
             warning : '..',
-            authUrl : 'http://localhost/OpenLab-Project/data/index.php/api/auth'
+            authUrl : 'https://openlabprojects.herokuapp.com/auth/login/'
         }
     },
     mounted() {
@@ -193,16 +193,16 @@ Vue.component('login',{
             if(checkData(self.workId,8)&&checkData(self.password,8)){
                 try{
                     store.commit('isLoading',true)
-                    await axios.get(self.authUrl,{
-                        params:{
+                    await axios.post(self.authUrl,{
+                        data:{
                             workId : self.workId,
                             password : self.password
                         }
                     }).then(function(response){
-                        if(response.data.res == "correct"){
+                        if(response.data != null){
                             console.log(response.data);
                             store.commit('updateAccount',response.data);
-                            document.cookie = "id="+ response.data.id +"; SameSite = None; Secure";
+                            document.cookie = "id="+ response.data._id +"; SameSite = None; Secure";
                             document.cookie = "authkey="+ response.data.authkey +"; SameSite = None; Secure";
                             setTimeout(function(){
                                 store.commit('isLoading',false);
