@@ -1,3 +1,6 @@
+//const { default: axios } = require("axios");
+
+
 
 function checkData(item, limit){
     var len = item.length;
@@ -73,23 +76,27 @@ async function updateTasks() {
     if(counter2 == 1){
         try{
             var url = "";
+            var data = null;
             if(store.state.account.account == "admin"){
+                data = {              
+                    _id : store.state.account._id,
+                    authkey : store.state.account.authkey,
+                }
                 url = "http://localhost:3000/task/admin/";
             }else{
+                data = {              
+                    _id : store.state.account._id,
+                    authkey : store.state.account.authkey,
+                    status : 'incomplete'
+                }
                 url = "http://localhost:3000/task/all/"; 
             }
             
             store.commit('isLoading',true);
-            await axios.get(url,{
-                params : {
-                    _id : store.state.account._id,
-                    authkey : store.state.account.authkey,
-
-                }
-            }).then(function(response){
+            await axios.post(url,data).then(function(response){
                 if(response.data){
                     counter2 = counter2 +1;
-                    store.commit("updateTasks",response.data.tasks);
+                    store.commit("updateTasks",response.data);
                     gotResults('done!');
                 }else{
                     gotResults('error getting results!');
@@ -228,7 +235,11 @@ Vue.component('login',{
                     })
     
                 }catch{
-                    var notification = alertify.notify('Error: check your internet', '', 10, function(){  console.log('dismissed'); });
+                    setTimeout(function(){
+                        store.commit('isLoading',false);
+                        store.commit('login',false)
+                    },1000)
+                    var notification = alertify.notify('failed!', '', 10, function(){  console.log('dismissed'); });
                 }
             }else{
                 var notification = alertify.notify('Error: enter a valid work id and password', '', 10, function(){  console.log('dismissed'); });
@@ -240,7 +251,7 @@ Vue.component('login',{
     template : '<div> <form class="col-md-6 col-10 alert log"> <h2>OpenLab</h2><p>Sign into your openlab account</p> <hr> <div class="form-group"> <label for="workid">Work Id</label> <input v-model="workId" type="text" class="form-control" id="workid" aria-describedby="workid" placeholder="work id"> <small id="workid" class="form-text text-muted">enter your work id.</small> </div> <div class="form-group"><br> <label for="InputPassword1">Password</label> <input v-model="password" type="password" class="form-control" id="InputPassword1" placeholder="Password"> </div> <br><button type="button" @click="login()" class="btn btn-success">Sign in</button> </form></div>'
 })
 Vue.component('main-view',{
-    template : '<div> <br><h4>Welcome to openlab</h4> <hr> <tasks></tasks></div>'
+    template : '<div> <br><h4>Welcome to openlab</h4> <p>Your incomplete tasks are listed below</p> <hr> <tasks></tasks></div>'
 })
 
 Vue.component('manage-employees',{
@@ -268,26 +279,26 @@ Vue.component('view-employee',{
     methods: {
    
     },
-    template : '<div><table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th> <th scope="col">Phone</th> <th scope="col">email address</th> </tr> </thead> <tbody> <tr v-for="a in $store.state.employees"> <th scope="row">{{a.workId}}</th> <td>{{a.name}}</td> <td>{{a.phone}}</td> <td>{{a.emailAddress}}</td> </tr> </tbody> </table></div>'
+    template : '<div><table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th> <th scope="col">Phone</th> <th scope="col">email address</th> </tr> </thead> <tbody> <tr v-for="a in $store.state.employees"  v-if="a._id != $store.state.account._id"> <th scope="row">{{a.workId}}</th> <td>{{a.name}} ({{a.status}})</td> <td>{{a.phone}}</td> <td>{{a.emailAddress}}</td> </tr> </tbody> </table></div>'
 })
 
 Vue.component('delete-employee',{
     methods: {
-        deleteEmployee: async function(workId){
-            console.log(workId)
-            if(checkData(workId,7)){
+        deleteEmployee: async function(a){
+            
+            if(checkData(a._id,7)){
                 try{
                     store.commit('isLoading',true);
-                    var url = "http://localhost/OpenLab-Project/data/index.php/api/deleteEmployee";
-                    await axios.get(url,{
-                        params : {
-                            deleteWorkId : workId,
-                            workId : store.state.account.id,
+                    var url = "http://localhost:3000/account/delete/";
+                    await axios.post(url,{
+                        
+                            userId : a._id,
+                            _id : store.state.account._id,
                             authkey : store.state.account.authkey,
                             
-                        }
+                        
                     }).then(function(response) {
-                        if(response.data.res == "correct"){
+                        if(response.data){
                             store.commit('updateEmployees',response.data.employees);
                             gotResults("done!");
 
@@ -301,7 +312,7 @@ Vue.component('delete-employee',{
             }
         }
     },
-    template : '<div> <h6>Delete Employee</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in $store.state.employees"> <th scope="row">{{a.workId}}</th> <td>{{a.name}}</td><td><button class="btn btn-danger" @click="deleteEmployee(a.work_id)">x</button></td> </tr> </tbody> </table> <br>  </div>'
+    template : '<div> <h6>Delete Employee</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">employee id</th> <th scope="col">Name</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in $store.state.employees" v-if="a._id != $store.state.account._id"> <th scope="row">{{a.workId}}</th> <td>{{a.name}}</td><td><button class="btn btn-danger" @click="deleteEmployee(a)">x</button></td> </tr> </tbody> </table> <br>  </div>'
 })
 
 
@@ -309,7 +320,35 @@ Vue.component('tasks',{
     beforeMount(){
         updateTasks();
     },
-    template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in $store.state.tasks"> <div class="card "> <div class="card-header"> {{a.title}} </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>{{a.description}}</p> <footer class="blockquote-footer">by {{a.author}}, <cite title="Source Title">for {{a.user}}.</cite></footer> </blockquote>  <button class="btn btn-success">close job</button> </div></div> </div></div></div>'
+    data : function(){
+        return{
+            complete :'complete'
+        }
+    },
+    methods : {
+        completeTask : function(a){
+            var url = "http://localhost:3000/task/complete/";
+            try{
+                store.commit('isLoading',true);
+                axios.post(url,{
+                    authkey : store.state.account.authkey,
+                    _id : store.state.account._id,
+                    taskId : a._id
+                }).then((response)=>{
+                    if(response.data){
+                        store.commit('updateTasks',response.data);
+                        store.commit('isLoading',false);
+                    }else{
+                        store.commit('isLoading',false);
+                    }
+                })
+            }catch{
+                store.commit('isLoading',false);
+                store.commit('isLoading',false);
+            }
+        }
+    },
+    template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in $store.state.tasks" v-if="a.recipient == $store.state.account._id && a.status != complete "> <div class="card "> <div class="card-header"> {{a.title}} </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>{{a.description}}</p> <br> <footer class="blockquote-footer">From {{a.authorName}}, <small title="Source Title">for {{a.recipientName}}.<hr> created {{a.date}}</small></footer> </blockquote>  <button @click="completeTask(a)" class="btn btn-success">close job</button> </div></div> </div></div></div>'
 })
 Vue.component('employee-tools',{
     methods: {
@@ -323,7 +362,7 @@ Vue.component('employee-tools',{
             },2000)
         }
     },
-    template : '<ul class="list-group list-group-flush"> <li class="list-group-item"><router-link to="/app/info" class="link"> tips and info</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/manage/employee/tasks">Your tasks</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/notice">notice board</router-link></li> <li  class="list-group-item"><a @click="signOut()">Sign Out</a></li> </ul>'
+    template : '<ul class="list-group list-group-flush"> <li class="list-group-item"><router-link to="/app/info" class="link"> tips and info</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/home">Your tasks</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/notice">notice board</router-link></li> <li  class="list-group-item"><a @click="signOut()">Sign Out</a></li> </ul>'
 })
 
 Vue.component('notice-view',{
@@ -379,7 +418,35 @@ Vue.component('profile',{
             workId : store.state.account.workId
         }
     },
-    template : '<div><br> <h4>Profile</h4> <hr><p>Status : {{status}}</p> <p>Account name : {{account}}</p> <p>Email address: {{email}}</p> <p>Department : {{department}}</p> <p>Phone Number : {{phone}}</p> <p>Position : {{position}}</p>  <br> <br><br></div>'
+    methods : {
+         setAvailability : async function(a){
+            try{
+                var url = "http://localhost:3000/account/availability" ;
+                var availability = ""
+                if(a == 0){
+                    availability = "busy"
+                }if(a == 1){
+                    var availability = "available"
+                }
+                store.commit('isLoading',true)
+                await axios.post(url,{
+                    authkey : store.state.account.authkey,
+                    _id : store.state.account._id,
+                    status : availability,
+                }).then((response)=>{
+                    if(response.data){
+                        store.commit('updateAccount',response.data);
+                        store.commit('isLoading',false);
+                    }else{
+                        store.commit('isLoading',false)
+                    }
+                })
+            }catch{
+                store.commit('isLoading',false)
+            }
+        }
+    },
+    template : '<div><br> <h4>Profile</h4> <hr><p>Status : {{status}}</p> <button @click="setAvailability(1)" class="btn btn-success">I am Available</button> or <button @click="setAvailability(0)" class="btn btn-danger">not available</button> <hr> <p>Account name : {{account}}</p> <p>Email address: {{email}}</p> <p>Department : {{department}}</p> <p>Phone Number : {{phone}}</p> <p>Position : {{position}}</p>  <br> <br><br></div>'
 })
 
 Vue.component('creating-task',{
@@ -404,39 +471,48 @@ Vue.component('creating-task',{
             viewResetTasks();
             
             var url = "http://localhost:3000/task/new/";
-            try{
-                await axios.post(url,{
-                    
-                        _id : store.state.account._id,
-                        authkey : store.state.account.authkey,
-                        recipientName : self.selectedEmployee.name,
-                        recipient : self.selectedEmployee._id,
-                        author : store.state.account._id,
-                        authorName : store.state.account.name,
-                        description : self.description,
-                        title : store.state.taskTitle,
+            if(store.state.taskTitle.length > 2){
+                try{
+                    store.commit('isLoading',true)
+                    await axios.post(url,{
                         
-                    
-                }).then(function(response){
-                    if(response.data){
-                        gotResults("successfully created!");
-                    }else{
-                        gotResults('failed to create!')
-                    }
-                })
-            }catch(e){
-                gotResults('something bad happenned!');
-                console.log(e);
+                            _id : store.state.account._id,
+                            authkey : store.state.account.authkey,
+                            recipientName : self.selectedEmployee.name,
+                            recipient : self.selectedEmployee._id,
+                            author : store.state.account._id,
+                            authorName : store.state.account.name,
+                            description : self.description,
+                            title : store.state.taskTitle,
+                            
+                        
+                    }).then(function(response){
+                        if(response.data){
+                            gotResults("successfully created!");
+                            store.commit('isLoading',false);
+                            store.state.taskTitle = "";
+                        }else{
+                            gotResults('failed to create!')
+                            store.commit('isLoading',false);
+                        }
+                    })
+                }catch(e){
+                    gotResults('something bad happenned!');
+                    store.commit('isLoading',false);
+                    console.log(e);
+                }
             }
+
         }
     },
-    template : '<div> <br> <h4>Creating task : <div class="alert alert-secondary">{{$store.state.taskTitle}}</div></h4>  <p>Add your tasks details below</p> <hr>  <label>Task description</label> <input v-model="description" class="form-control" placeholder="description"></input>  <br> <label>Employee id</label><select id="employees" class="form-select"><option  v-for="a in $store.state.employees" @click="selectPerson(a)">{{a.name}}</option> </select><br> <button class="btn btn-success" @click="createTask()" >Create</button> <br><br></div>'
+    template : '<div> <br> <h4>Creating task : <div class="alert alert-secondary">{{$store.state.taskTitle}}</div></h4>  <p>Add your tasks details below</p> <hr>  <label>Task description</label> <input v-model="description" class="form-control" placeholder="description"></input>  <br> <label>Employee id</label><select id="employees" class="form-select"><option  v-for="a in $store.state.employees" @click="selectPerson(a)">{{a.name}}  ({{a.status}})</option> </select><br> <button class="btn btn-success" @click="createTask()" >Create</button> <br><br></div>'
 })
 
 Vue.component('nav-bar',{
     data : function(){
         return{
-            status : store.state.account.status
+            status : store.state.account.status,
+            isBusy : 'busy',
         }
     },
     methods : {
@@ -444,7 +520,7 @@ Vue.component('nav-bar',{
             
         }
     },
-    template : '<div>    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> <div class="container-fluid"> <router-link class="navbar-brand" to="/dashboard/home" >OpenLab</router-link> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="navbarNav"> <ul class="navbar-nav"> <li class="nav-item"> <router-link class="ln" to="/dashboard/profile" >Profile</router-link> </li> <li class=" navbar-item" @press="">change Status({{status}})</li></ul> </div> </div> </nav></div>'
+    template : '<div>    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> <div class="container-fluid"> <router-link class="navbar-brand" to="/dashboard/home" >OpenLab</router-link> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="navbarNav"> <ul class="navbar-nav"> <li class="nav-item"> <router-link class="ln" to="/dashboard/profile" >Profile</router-link> </li><li class=" navbar-item" style="color:green" v-if="status != isBusy ">Status({{status}})</li> <li class=" navbar-item" style="color:red" v-if="status == isBusy ">Status({{status}})</li></ul> </div> </div> </nav></div>'
 })
 
 Vue.component('landing-page',{
@@ -484,16 +560,62 @@ Vue.component('manage-tasks',{
 })
 
 Vue.component('delete-task',{
-    template : '<div> <h4>Delete tasks</h4> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">Task</th> <th scope="col">for</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in $store.state.tasks"> <th scope="row">{{a.title}}</th> <td>{{a.user}}</td><td><button class="btn btn-danger">x</button></td> </tr> </tbody> </table> </div>'
+    methods :{
+        deleteTask : function(a){
+            
+            if(a._id.length > 1){
+                
+                try{
+                    console.log(a)
+                    var url = "http://localhost:3000/task/delete/";
+                    store.commit('isLoading',true)
+                    axios.post(url,{
+                        taskId : a._id,
+                        _id : store.state.account._id,
+                        authkey : store.state.account.authkey
+                    
+                    }).then((response)=>{
+                        if(response.data){
+                            store.commit('updateTasks',response.data)
+                            setTimeout(function(){
+                                store.commit('isLoading',false);
+                               
+                            },2000)
+                            
+                        }else{
+                            store.commit('isLoading',false)
+                        }
+                    })
+                }catch{
+                    store.commit('isLoading',false)
+                }
+            }
+        }
+    },
+    data : function(){
+        return{
+            inComplete : 'incomplete'
+        }
+    },
+
+    template : '<div> <h4>Delete tasks</h4> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">Task</th> <th scope="col">for</th><th scope="col">option</th></tr> </thead> <tbody> <tr v-for="a in $store.state.tasks"> <th scope="row">{{a.title}}  <p v-if="a.status != inComplete" style="color:green">({{a.status}})</p> <p v-if="a.status == inComplete" style="color:red">({{a.status}})</p></th> <td>{{a.recipientName}}</td><td><button @click="deleteTask(a)"  class="btn btn-danger">x</button></td> </tr> </tbody> </table> </div>'
 })
 Vue.component('add-tasks',{
     template : '<div>add</div>'
 })
 
 Vue.component('view-task',{
-    template : '<div> <h6>viewing tasks</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">Task</th> <th scope="col">for</th><th scope="col">description</th></tr> </thead> <tbody> <tr v-for="a in $store.state.tasks"> <th scope="row">{{a.title}}</th> <td>{{a.user}}</td><td>{{a.description}}</td> </tr> </tbody> </table>  </div>'
-})
+    data : function(){
+        return{
+            isComplete : 'incomplete'
 
+        }
+    },
+    template : '<div> <h6>viewing tasks</h6> <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">Task</th> <th scope="col">for</th><th scope="col">description</th></tr> </thead> <tbody> <tr v-for="a in $store.state.tasks"> <th scope="row">{{a.title}} <p v-if="a.status != isComplete" style="color:green">({{a.status}})</p> <p v-if="a.status == isComplete" style="color:red">({{a.status}})</p></th> <td>{{a.recipientName}}</td><td>{{a.description}}</td> </tr> </tbody> </table>  </div>'
+})
+Vue.component('user-tasks',{
+    template : '<div><h1>tasks</h1></div>'
+})
 const routes = [
     {
         path: '/',
@@ -526,6 +648,10 @@ const routes = [
     {
         path : '/dashboard/manage/employees',
         component : 'manage-employees'
+    },
+    {
+        path : 'dashboard/manage/employee/tasks',
+        component : 'user-tasks'
     }
 ]
 
@@ -591,7 +717,7 @@ var app = new Vue({
                             _id : getCookie("id")
                        
                     }).then(function(response){
-                        if(response.data != null){
+                        if(response.data){
                             console.log(response.data);
                             
                             store.commit('updateAccount',response.data);

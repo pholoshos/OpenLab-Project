@@ -7,7 +7,8 @@ const TasksSchema = mongoose.Schema({
     },
     authorName : {
         type : String,
-        default : ' '
+        default : ' ',
+        required : true,
     },
     author : {
         type : String,

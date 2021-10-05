@@ -8,9 +8,7 @@ const serveStatic = require("serve-static")
 
 const path = require('path');
 app = express();
-app.use(cors({
-    origin: '*'
-}));
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -39,6 +37,7 @@ app.use(serveStatic(path.join(__dirname, 'dist')))
 //connect to database
 mongoose.connect(process.env.DB_CONNECTION,{
     useNewUrlParser: true,
+    useFindAndModify: false,
     useUnifiedTopology: true,
     useCreateIndex: true,   })   
 .then(() => console.log("Database connected!"))

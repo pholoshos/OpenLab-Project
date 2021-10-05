@@ -40,7 +40,7 @@ const check = async (data,op,res)=>{
     await User.exists(data,(err,userFound)=>{
          if(err){
              res.status(404).json('user error');
-             return false;
+             //return false;
          }else{
              if(userFound){
                  if(op == 0){
@@ -50,7 +50,7 @@ const check = async (data,op,res)=>{
                      }, (err)=>{
                          if(err){
                              res.status(500).json('something went wrong');
-                             return false;
+                             //return false;
                          }
                      })
                   
@@ -58,10 +58,10 @@ const check = async (data,op,res)=>{
                  User.findOne(data,'workId name authkey emailAddress account status phone department position _id',(err,user)=>{
                      if(err){
                          res.status(500).json('something went wrong');
-                         return false;
+                         //return false;
                      }else{
                          if(op == 3){
-                             return true;
+                             //return true;
                          }else{
                              res.json(user);
                          }
@@ -72,7 +72,7 @@ const check = async (data,op,res)=>{
              }else{
                  res.status(404).json('user not found');
                  if(op == 3){
-                     return false;
+                     //return false;
                  }
              }
          }

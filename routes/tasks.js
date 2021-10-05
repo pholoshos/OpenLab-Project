@@ -70,6 +70,7 @@ router.post('/new',(req,res)=>{
         }else{
             const task = new Task({
                 title : req.body.title,
+                authorName : req.body.authorName,
                 description : req.body.description,
                 author : req.body.author,
                 recipientName : req.body.recipientName,
@@ -91,7 +92,8 @@ router.post('/new',(req,res)=>{
 router.post('/delete',(req,res)=>{
     const data = {
         authkey  : req.body.authkey,
-        _id: req.body._id
+        _id: req.body._id,
+        account : 'admin'
     }
     User.exists(data,(err,foundUser)=>{
         if(!err && foundUser){
@@ -101,9 +103,19 @@ router.post('/delete',(req,res)=>{
             }
             Task.deleteOne(taskData,(err)=>{
                 if(!err){
-                    res.json({results: 'done'})
+                    
                 }else{
                     res.status(500).json('failed')
+                }
+            })
+            var findData = {
+                author : req.body._id,
+            }
+            Task.find(findData,(err,tasks)=>{
+                if(!err){
+                    res.json(tasks);
+                }else{
+                    res.status(500).json(err);
                 }
             })
         }else{
@@ -128,9 +140,9 @@ router.post('/complete',(req,res)=>{
                 _id : req.body.taskId,
                 
             }
-            Task.findOneAndUpdate(taskData,{status: 'complete'},(err,isDone)=>{
+            Task.findOneAndUpdate(taskData,{status: 'complete'},(err,tasks)=>{
                 if(!err){
-                    res.json({results :'done'});
+                    res.json(tasks);
                 }else{
                     res.status(500).json('error')
                 }

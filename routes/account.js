@@ -85,6 +85,35 @@ router.get('/department',(req,res)=>{
         }
     })
 });
+router.post('/delete',(req,res)=>{
+    if(req.body.userId != req.body._id){
+        const data = {
+            authkey  : req.body.authkey,
+            _id: req.body._id,
+            account : 'admin'
+        }
+        User.exists(data,(err,foundUser)=>{
+            if(!err && foundUser){
+                const userData = {
+                    _id : req.body.userId,
+                    
+                }
+                User.deleteOne(userData,(err)=>{
+                    if(!err){
+                        res.json({results: 'done'})
+                    }else{
+                        res.status(500).json('failed')
+                    }
+                })
+            }else{
+                res.status(500).json('eror');
+            }
+        })
+    }else{
+        res.status(500).json("cant delete your own account");
+    }
+
+});
 
 router.get('/position',(req,res)=>{
     const data = {
@@ -109,7 +138,8 @@ router.get('/position',(req,res)=>{
     })
 });
 
-router.get('/available',(req,res)=>{
+
+router.post('/available',(req,res)=>{
     const data = {
         authkey  : req.body.authkey,
         _id: req.body._id
@@ -132,7 +162,7 @@ router.get('/available',(req,res)=>{
     })
 });
 
-router.get('/busy',(req,res)=>{
+router.post('/busy',(req,res)=>{
     const data = {
         authkey  : req.body.authkey,
         _id: req.body._id
@@ -148,6 +178,40 @@ router.get('/busy',(req,res)=>{
                     res.json(accounts);
                 }else{
                     res.status(500).json('error')
+                }
+            })
+        }else{
+            res.status(500).json('error')
+        }
+    })
+});
+
+router.post('/availability',(req,res)=>{
+    const data = {
+        authkey  : req.body.authkey,
+        _id: req.body._id
+    }
+    User.exists(data,(err,foundUser)=>{
+        if(!err && foundUser){
+            const newData = {
+                authkey : req.body.authkey,
+                _id : req.body._id
+            }
+            User.updateOne(newData,{
+                status : req.body.status
+            }, (err)=>{
+                if(err){
+                    res.status(500).json('something went wrong');
+                    //return false;
+                }
+            })
+            User.findOne(data,'workId name authkey emailAddress account status phone department position _id',(err,user)=>{
+                if(err){
+                    res.status(500).json('something went wrong');
+                    //return false;
+                }else{
+                    res.json(user);
+                    
                 }
             })
         }else{
