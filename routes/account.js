@@ -19,7 +19,7 @@ router.post('/create',(req,res)=>{
             const user = new User({
                 workId : req.body.workId,
                 emailAddress : req.body.emailAddress,
-                phone : req.body.bio,
+                phone : req.body.phone,
                 position : req.body.position,
                 department : req.body.department,
                 password : req.body.password,
