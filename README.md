@@ -7,14 +7,4 @@ for development of the backend part, you will need nodejs installed on your comp
 <h1>Adds</h1>
 web application link https://openlabprojects.herokuapp.com/
 
-not much has changed on the frontend part,
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm start
-```
 
