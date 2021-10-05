@@ -46,11 +46,11 @@ router.post('/get',(req,res)=>{
                 if(!err){
                     res.json(notifications);
                 }else{
-                    res.status(500).json("error");
+                    res.status(500).json(err);
                 }
             })
         }else{
-            res.status(500).json('eror');
+            res.status(500).json('error: user not found');
         }
     })
 });
