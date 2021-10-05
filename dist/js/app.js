@@ -43,7 +43,7 @@ var counter = 0;
 var counter2 = 0;
 
 async function getNotifications(){
-    var url = "https://openlabprojects.herokuapp.com/notifications/get/";
+    var url = "https://openlabprojects.herokuapp.com/notifications/get";
     await axios.post(url,{
         authkey : store.state.account.authkey,
         _id :store.state.account._id,
@@ -66,10 +66,10 @@ async function updateEmployees() {
             var url = "";
             var data = null;
             if(store.state.account.account == "admin"){
-                url = "https://openlabprojects.herokuapp.com/account/all/";
+                url = "https://openlabprojects.herokuapp.com/account/all";
 
             }else{
-                url = "https://openlabprojects.herokuapp.com/account/department/";
+                url = "https://openlabprojects.herokuapp.com/account/department";
             }
             store.commit('isLoading',true);
             await axios.post(url,{
@@ -105,14 +105,14 @@ async function updateTasks() {
                     _id : store.state.account._id,
                     authkey : store.state.account.authkey,
                 }
-                url = "https://openlabprojects.herokuapp.com/task/admin/";
+                url = "https://openlabprojects.herokuapp.com/task/admin";
             }else{
                 data = {              
                     _id : store.state.account._id,
                     authkey : store.state.account.authkey,
                     status : 'incomplete'
                 }
-                url = "https://openlabprojects.herokuapp.com/task/all/"; 
+                url = "https://openlabprojects.herokuapp.com/task/all"; 
             }
             
             store.commit('isLoading',true);
@@ -177,7 +177,7 @@ Vue.component('create-employee',{
             if(check == true){
                 try{
                     store.commit('isLoading',true);
-                    var createUrl = "https://openlabprojects.herokuapp.com/account/create/";
+                    var createUrl = "https://openlabprojects.herokuapp.com/account/create";
                     await axios.post(createUrl,{
                         
                             phone : self.phone,
@@ -216,7 +216,7 @@ Vue.component('login',{
             password : '',
             workId : '',
             warning : '..',
-            authUrl : 'https://openlabprojects.herokuapp.com/auth/login/'
+            authUrl : 'https://openlabprojects.herokuapp.com/auth/login'
         }
     },
     mounted() {
@@ -312,7 +312,7 @@ Vue.component('delete-employee',{
             if(checkData(a._id,7)){
                 try{
                     store.commit('isLoading',true);
-                    var url = "https://openlabprojects.herokuapp.com/account/delete/";
+                    var url = "https://openlabprojects.herokuapp.com/account/delete";
                     await axios.post(url,{
                         
                             userId : a._id,
@@ -350,7 +350,7 @@ Vue.component('tasks',{
     },
     methods : {
         completeTask : function(a){
-            var url = "https://openlabprojects.herokuapp.com/task/complete/";
+            var url = "https://openlabprojects.herokuapp.com/task/complete";
             try{
                 store.commit('isLoading',true);
                 axios.post(url,{
@@ -430,7 +430,7 @@ Vue.component('delete-notifications',{
             if(checkData(a._id,7)){
                 try{
                     store.commit('isLoading',true);
-                    var url = "https://openlabprojects.herokuapp.com/notifications/delete/";
+                    var url = "https://openlabprojects.herokuapp.com/notifications/delete";
                     await axios.post(url,{
                         
                             notificationId : a._id,
@@ -472,7 +472,7 @@ Vue.component('create-notification',{
         createNotification : function(){
             const self = this;
             if(self.title.length > 2 && self.description.length > 2){
-                var url = "https://openlabprojects.herokuapp.com/notifications/create/"
+                var url = "https://openlabprojects.herokuapp.com/notifications/create"
                 store.commit('isLoading',true);
                 axios.post(url,{
                     department : store.state.account.department,
@@ -588,7 +588,7 @@ Vue.component('creating-task',{
             const self = this;
             viewResetTasks();
             
-            var url = "https://openlabprojects.herokuapp.com/task/new/";
+            var url = "https://openlabprojects.herokuapp.com/task/new";
             if(store.state.taskTitle.length > 2){
                 try{
                     store.commit('isLoading',true)
@@ -685,7 +685,7 @@ Vue.component('delete-task',{
                 
                 try{
                     console.log(a)
-                    var url = "https://openlabprojects.herokuapp.com/task/delete/";
+                    var url = "https://openlabprojects.herokuapp.com/task/delete";
                     store.commit('isLoading',true)
                     axios.post(url,{
                         taskId : a._id,
@@ -830,7 +830,7 @@ var app = new Vue({
             if(getCookie("authkey") != null){
                 try{
                     store.commit('isLoading',true)
-                    await axios.post("https://openlabprojects.herokuapp.com/auth/",{
+                    await axios.post("https://openlabprojects.herokuapp.com/auth",{
                         
                             authkey : getCookie("authkey"),
                             _id : getCookie("id")
