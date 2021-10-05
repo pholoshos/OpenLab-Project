@@ -63,7 +63,7 @@ router.post('/all',(req,res)=>{
 
 });
 
-router.get('/department',(req,res)=>{
+router.post('/department',(req,res)=>{
     const data = {
         authkey  : req.body.authkey,
         _id: req.body._id

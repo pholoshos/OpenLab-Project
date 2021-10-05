@@ -18,6 +18,14 @@ const NotificationSchema = mongoose.Schema({
         type : Date,
         default : Date.now,
 
+    },
+    department : {
+        type : String,
+        required : true,
+    },
+    authorName : {
+        type : String,
+        required : true,
     }
 
 });

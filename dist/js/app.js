@@ -1,7 +1,6 @@
 //const { default: axios } = require("axios");
 
 
-
 function checkData(item, limit){
     var len = item.length;
     return !(len < limit);
@@ -43,16 +42,40 @@ function getCookie(name) {
 var counter = 0;
 var counter2 = 0;
 
+async function getNotifications(){
+    var url = "https://openlabprojects.herokuapp.com/notifications/get/";
+    await axios.post(url,{
+        authkey : store.state.account.authkey,
+        _id :store.state.account._id,
+        department : store.state.account.department
+    }).then((response)=>{
+        if(response.data){
+            store.commit('updateNotifications',response.data)
+            gotResults("done!")
+            
+        }else{
+            gotResults("error!")
+        }
+        
+    })
+}
 async function updateEmployees() {
     counter += 1;
     if(counter == 1){
         try{
- 
-            var url = "http://localhost:3000/account/all/";
+            var url = "";
+            var data = null;
+            if(store.state.account.account == "admin"){
+                url = "https://openlabprojects.herokuapp.com/account/all/";
+
+            }else{
+                url = "https://openlabprojects.herokuapp.com/account/department/";
+            }
             store.commit('isLoading',true);
             await axios.post(url,{
                   
                     _id : store.state.account._id,
+                    department : store.state.account.department,
                     authkey : store.state.account.authkey
                 
             }).then(function(response){
@@ -82,14 +105,14 @@ async function updateTasks() {
                     _id : store.state.account._id,
                     authkey : store.state.account.authkey,
                 }
-                url = "http://localhost:3000/task/admin/";
+                url = "https://openlabprojects.herokuapp.com/task/admin/";
             }else{
                 data = {              
                     _id : store.state.account._id,
                     authkey : store.state.account.authkey,
                     status : 'incomplete'
                 }
-                url = "http://localhost:3000/task/all/"; 
+                url = "https://openlabprojects.herokuapp.com/task/all/"; 
             }
             
             store.commit('isLoading',true);
@@ -154,7 +177,7 @@ Vue.component('create-employee',{
             if(check == true){
                 try{
                     store.commit('isLoading',true);
-                    var createUrl = "http://localhost:3000/account/create/";
+                    var createUrl = "https://openlabprojects.herokuapp.com/account/create/";
                     await axios.post(createUrl,{
                         
                             phone : self.phone,
@@ -193,7 +216,7 @@ Vue.component('login',{
             password : '',
             workId : '',
             warning : '..',
-            authUrl : 'http://localhost:3000/auth/login/'
+            authUrl : 'https://openlabprojects.herokuapp.com/auth/login/'
         }
     },
     mounted() {
@@ -289,7 +312,7 @@ Vue.component('delete-employee',{
             if(checkData(a._id,7)){
                 try{
                     store.commit('isLoading',true);
-                    var url = "http://localhost:3000/account/delete/";
+                    var url = "https://openlabprojects.herokuapp.com/account/delete/";
                     await axios.post(url,{
                         
                             userId : a._id,
@@ -327,7 +350,7 @@ Vue.component('tasks',{
     },
     methods : {
         completeTask : function(a){
-            var url = "http://localhost:3000/task/complete/";
+            var url = "https://openlabprojects.herokuapp.com/task/complete/";
             try{
                 store.commit('isLoading',true);
                 axios.post(url,{
@@ -348,7 +371,7 @@ Vue.component('tasks',{
             }
         }
     },
-    template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in $store.state.tasks" v-if="a.recipient == $store.state.account._id && a.status != complete "> <div class="card "> <div class="card-header"> {{a.title}} </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>{{a.description}}</p> <br> <footer class="blockquote-footer">From {{a.authorName}}, <small title="Source Title">for {{a.recipientName}}.<hr> created {{a.date}}</small></footer> </blockquote>  <button @click="completeTask(a)" class="btn btn-success">close job</button> </div></div> </div></div></div>'
+    template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in $store.state.tasks" v-if="a.recipient == $store.state.account._id && a.status != complete "> <div class="card "> <div class="card-header"> {{a.title}} </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>{{a.description}}</p> <br> <footer class="blockquote-footer">From {{a.authorName}}, <small title="Source Title">for {{a.recipientName}}.<hr> created {{a.date}}</small></footer> </blockquote>  <button @click="completeTask(a)" class="btn btn-success">I am Done!</button> </div></div> </div></div></div>'
 })
 Vue.component('employee-tools',{
     methods: {
@@ -362,7 +385,18 @@ Vue.component('employee-tools',{
             },2000)
         }
     },
-    template : '<ul class="list-group list-group-flush"> <li class="list-group-item"><router-link to="/app/info" class="link"> tips and info</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/home">Your tasks</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/notice">notice board</router-link></li> <li  class="list-group-item"><a @click="signOut()">Sign Out</a></li> </ul>'
+    template : '<ul class="list-group list-group-flush"> <li class="list-group-item"><router-link to="/app/info" class="link"> tips and info</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/home">Your tasks</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/people">People</router-link></li> <li class="list-group-item"><router-link class="link" to="/dashboard/notice">notice board</router-link></li> <li  class="list-group-item"><a @click="signOut()">Sign Out</a></li> </ul>'
+})
+Vue.component('view-people',{
+    mounted(){
+        updateEmployees();
+    },
+    data : function(){
+        return{
+            inComplete : 'busy'
+        }
+    },
+    template : '<div> <br><h4>Viewing people</h4> <p>list of people in your workplace</p>  <hr>    <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">availability</th> <th scope="col">Name</th> <th scope="col">Phone</th> <th scope="col">email address</th> </tr> </thead> <tbody> <tr v-for="a in $store.state.employees" > <th scope="row"> <p v-if="a.status != inComplete" style="color:green">({{a.status}})</p> <p v-if="a.status == inComplete" style="color:red">({{a.status}})</p></th> <td>{{a.name}}</td> <td>{{a.phone}}</td> <td>{{a.emailAddress}}</td> </tr> </tbody> </table> <br> </div>'
 })
 
 Vue.component('notice-view',{
@@ -375,17 +409,101 @@ Vue.component('notice-view',{
         options : function(i){
             const self = this;
             self.view = i;
+            
+        },
+    },
+    mounted(){
+        getNotifications();
+    },
+    template : '<div> <br> <h4>Notifications</h4> <p>know whats going on</p><div><button @click="options(1)" class="btn btn-secondary">View</button>  <button @click="options(2)" class="btn btn-secondary">New Notification</button>  <button @click="options(3)" class="btn btn-secondary">Delete</button>  </div><hr> <notifications v-if="view ==1"></notifications> <create-notification v-if="view == 2"> </create-notification> <delete-notifications v-if=" view == 3"></delete-notifications> </div>'
+})
+
+Vue.component('delete-notifications',{
+    data : function(){
+        return {
+
         }
     },
-    template : '<div> <br> <h4>Notifications</h4> <p>know whats going on</p><div><button @click="options(1)" class="btn btn-secondary">View</button>  <button @click="options(2)" class="btn btn-secondary">New Notification</button>  </div><hr> <notifications v-if="view ==1"></notifications> <create-notification v-if="view == 2"> </create-notification> </div>'
+    methods : {
+        deleteNoti: async function(a){
+            
+            if(checkData(a._id,7)){
+                try{
+                    store.commit('isLoading',true);
+                    var url = "https://openlabprojects.herokuapp.com/notifications/delete/";
+                    await axios.post(url,{
+                        
+                            notificationId : a._id,
+                            _id : store.state.account._id,
+                            authkey : store.state.account.authkey,
+                            
+                        
+                    }).then(function(response) {
+                        if(response.data){
+                            getNotifications();
+                            gotResults("done!");
+                            setTimeout(function(){
+                                store.commit('isLoading',false);
+
+                            },1000)
+
+                        }else{
+                            gotResults("error,failed!");
+                        }
+                    })
+                }catch(err){
+                    gotResults(err.message);
+                }
+            }
+        }
+    },
+    template : '<div>  <table class="table"> <thead class="thead-dark"> <tr> <th scope="col">title</th> <th scope="col">description</th><th scope="col">option</th></tr> </thead> <tbody> <tr  v-for="a in $store.state.notifications" v-if="a.author == $store.state.account._id"> <th scope="row">{{a.title}}</th> <td>{{a.description}}</td><td><button class="btn btn-danger" @click="deleteNoti(a)">x</button></td> </tr> </tbody> </table> <br> </div>'
 })
 
 Vue.component('create-notification',{
-    template : '<div><h4>Create notification</h4>  <div> <label>Enter your title</label><input class="form-control" placeholder="enter title"> <br> <label>Enter your title</label><input class="form-control" placeholder="enter body"></div> <button class="btn btn-success">Create</button> <br><br> </div>'
+    data : function(){
+        return{
+            title : '',
+            description : '',
+
+        }
+    },
+    methods : {
+        createNotification : function(){
+            const self = this;
+            if(self.title.length > 2 && self.description.length > 2){
+                var url = "https://openlabprojects.herokuapp.com/notifications/create/"
+                store.commit('isLoading',true);
+                axios.post(url,{
+                    department : store.state.account.department,
+                    _id : store.state.account._id,
+                    authkey : store.state.account.authkey,
+                    description : self.description,
+                    title : self.title,
+                    author : store.state.account._id,
+                    authorName : store.state.account.name,
+                }).then((response)=>{
+                    if(response.data){
+                        getNotifications();
+                        self.title = "",
+                        self.description = ""
+                        setTimeout(function(){
+                            store.commit('isLoading',false);
+                            gotResults("done")
+                        },2000)
+                        
+                    }else{
+                        gotResults("failed!")
+                    }
+                })
+            }
+        }
+    },
+    template : '<div><h4>Create notification</h4>  <div> <label>Enter your title</label><input class="form-control" placeholder="enter title" v-model="title"> <br> <label>Enter description</label><input v-model="description" class="form-control" placeholder="enter body"></div> <button @click="createNotification()" class="btn btn-success">Create</button> <br><br> </div>'
 })
 
 Vue.component('notifications',{
-    template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in 3"> <div class="card "> <div class="card-header"> Alert </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>send message to john</p> <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer> </blockquote>   </div></div> </div></div></div>'
+    template : '<div> <div class="row" > <div class="col-md-6 it" v-for="a in $store.state.notifications"> <div class="card "> <div class="card-header"> {{a.title}} </div> <div class="card-body"> <blockquote class="blockquote mb-0"> <p>{{a.description}}</p> <footer class="blockquote-footer"> {{a.authorName}} <hr> <small> {{a.date}}</small></footer> </blockquote>   </div></div> </div></div></div>'
 })
 
 Vue.component('tools',{
@@ -421,7 +539,7 @@ Vue.component('profile',{
     methods : {
          setAvailability : async function(a){
             try{
-                var url = "http://localhost:3000/account/availability" ;
+                var url = "https://openlabprojects.herokuapp.com/account/availability" ;
                 var availability = ""
                 if(a == 0){
                     availability = "busy"
@@ -470,7 +588,7 @@ Vue.component('creating-task',{
             const self = this;
             viewResetTasks();
             
-            var url = "http://localhost:3000/task/new/";
+            var url = "https://openlabprojects.herokuapp.com/task/new/";
             if(store.state.taskTitle.length > 2){
                 try{
                     store.commit('isLoading',true)
@@ -567,7 +685,7 @@ Vue.component('delete-task',{
                 
                 try{
                     console.log(a)
-                    var url = "http://localhost:3000/task/delete/";
+                    var url = "https://openlabprojects.herokuapp.com/task/delete/";
                     store.commit('isLoading',true)
                     axios.post(url,{
                         taskId : a._id,
@@ -650,8 +768,8 @@ const routes = [
         component : 'manage-employees'
     },
     {
-        path : 'dashboard/manage/employee/tasks',
-        component : 'user-tasks'
+        path : '/dashboard/people',
+        component : 'view-people'
     }
 ]
 
@@ -667,6 +785,7 @@ const store = new Vuex.Store({
         loading : true,
         taskTitle  : '',
         account : null,
+        
         tasks : null,
         notifications : null,
         employees : null,
@@ -708,10 +827,10 @@ var app = new Vue({
     },
     methods: {
         login2 : async function() {
-            if(getCookie("authkey").length >2){
+            if(getCookie("authkey") != null){
                 try{
                     store.commit('isLoading',true)
-                    await axios.post("http://localhost:3000/auth/",{
+                    await axios.post("https://openlabprojects.herokuapp.com/auth/",{
                         
                             authkey : getCookie("authkey"),
                             _id : getCookie("id")
@@ -723,9 +842,11 @@ var app = new Vue({
                             store.commit('updateAccount',response.data);
                             document.cookie = "id="+ response.data._id +"; SameSite = None; Secure";
                             document.cookie = "authkey="+ response.data.authkey +"; SameSite = None; Secure";
+                            getNotifications()
                             setTimeout(function(){
                                 store.commit('isLoading',false);
                                 store.commit('login',true)
+
                             },2000)
                             
                         }else{
