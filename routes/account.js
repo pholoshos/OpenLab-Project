@@ -20,7 +20,7 @@ router.post('/create',(req,res)=>{
                 workId : req.body.workId,
                 emailAddress : req.body.emailAddress,
                 phone : req.body.bio,
-                position : req.body.password,
+                position : req.body.position,
                 department : req.body.department,
                 password : req.body.password,
                 name : req.body.name,
