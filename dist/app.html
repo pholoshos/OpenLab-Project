@@ -65,8 +65,11 @@
         }
       }
       body{
-        background-color: rgb(57, 57, 57);
-        color: white;
+        background-image: url("backgrounds.jpg");
+        background-repeat: no-repeat;
+        background-size: cover;
+        
+        
       }
     </style>
     
@@ -81,7 +84,7 @@
         <dashboard></dashboard>
       </div>
       <div class="container" v-if="!$store.state.isLoggedIn &&  !$store.state.loading" > 
-        <login></login>
+        <login style="margin-top: -80px;"></login>
       </div>
 
       <div v-if="$store.state.loading">
