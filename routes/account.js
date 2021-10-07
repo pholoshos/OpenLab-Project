@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mailer = require('nodemailer');
 const User = require('../models/User');
 
 
@@ -33,6 +34,7 @@ router.post('/create',(req,res)=>{
                     res.status(404).json('error: '+err);
                 }else{
                     res.json({mess : 'done!'})
+                    sendMessage(req.res,1)
                 }
             })
         }else{
@@ -62,6 +64,33 @@ router.post('/all',(req,res)=>{
     })
 
 });
+
+//send email
+const sendMessage = async(req,res,op)=>{
+    let transporter = mailer.createTransport({
+        service : 'Gmail',
+        auth : {
+            user : 'openlabprojects@gmail.com',
+            pass : 'Victor03@'
+        }
+    })
+    var data = "";
+    var sub = ""
+    if(op == 1){
+        sub = "Openlab Account Activated!"
+        data = '<p>Hello , someone has created an account for you on openlab, here are the login details.</p> <h4>Work ID is: </h4>'+req.body.workId+'<h4>Password:</h4>'+req.body.password;
+    }if(op == 2){
+        sub = "Openlab account terminated!"
+        data = "<p>Notification!</p><h4>Your openlab account has been closed. you will nolonger have access  to openlab</h4>"
+    }
+    let info =  await transporter.sendMail({
+        from : 'openlabprojects@gmail.com',
+        to : req.body.emailAddress,
+        subject : sub,
+        html :  data,
+    })
+    
+}
 
 router.post('/department',(req,res)=>{
     const data = {
@@ -101,6 +130,7 @@ router.post('/delete',(req,res)=>{
                 User.deleteOne(userData,(err)=>{
                     if(!err){
                         res.json({results: 'done'})
+                        sendMessage(req,res,2)
                     }else{
                         res.status(500).json('failed')
                     }
