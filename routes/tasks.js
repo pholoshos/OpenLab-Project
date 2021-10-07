@@ -147,7 +147,7 @@ router.post('/complete',(req,res)=>{
             Task.findOneAndUpdate(taskData,{status: 'complete'},(err,tasks)=>{
                 if(!err){
                     res.json(tasks);
-                    sendMessage(req,res,4)
+                    sendMessage(req,res,1)
                 }else{
                     res.status(500).json('error')
                 }
@@ -165,17 +165,8 @@ const sendMessage = (req,res,op)=>{
 
     var data = "";
     var sub = ""
+
     if(op == 1){
-        sub = "Openlab Account Activated!"
-        data = '<p>Hello , someone has created an account for you on openlab, here are the login details.</p> <h4>Work ID is: </h4>'+req.body.workId+'<h4>Password:</h4>'+req.body.password+"<br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>";
-    }if(op == 2){
-        sub = "Openlab account terminated!"
-        data = "<p>Notification!</p><h4>Your openlab account has been closed. you will nolonger have access  to openlab</h4> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
-    }if(op == 3){
-        sub = "New Task From "+req.body.authorName+" on Openlab"
-        data = "<h4>You have A new Task from "+req.body.authorName+"</h4><p> task description : "+req.body.description+" </p> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
-    }
-    if(op == 3){
         sub = " "+req.body.authorName+" has completed Task on Openlab"
         data = "<h4>You have A new Task from "+req.body.authorName+"</h4><p> task description : "+req.body.description+" </p> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
     }
