@@ -319,6 +319,7 @@ Vue.component('delete-employee',{
                             userId : a._id,
                             _id : store.state.account._id,
                             authkey : store.state.account.authkey,
+                            emailAddress : a.emailAddress
                             
                         
                     }).then(function(response) {
