@@ -10,6 +10,11 @@ const TasksSchema = mongoose.Schema({
         default : ' ',
         required : true,
     },
+    authorEmail : {
+        type : String,
+        default : ' ',
+        required : true,
+    },
     author : {
         type : String,
         required : true,

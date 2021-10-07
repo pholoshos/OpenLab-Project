@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mailer = require('nodemailer');
 const User = require('../models/User');
-
+var smtpTransport = require('nodemailer-smtp-transport');
 
 router.get('/',(req,res)=>{
     res.send('account');
@@ -43,6 +43,10 @@ router.post('/create',(req,res)=>{
     })
 
 })
+router.post('/sendMessage',(req,res)=>{
+    sendMessage(req,res,1);
+});
+
 router.post('/all',(req,res)=>{
     const data = {
         _id : req.body._id,
@@ -66,29 +70,46 @@ router.post('/all',(req,res)=>{
 });
 
 //send email
-const sendMessage = async(req,res,op)=>{
-    let transporter = mailer.createTransport({
-        service : 'Gmail',
-        auth : {
-            user : 'openlabprojects@gmail.com',
-            pass : 'Victor03@'
-        }
-    })
+const sendMessage = (req,res,op)=>{
+
     var data = "";
     var sub = ""
     if(op == 1){
         sub = "Openlab Account Activated!"
-        data = '<p>Hello , someone has created an account for you on openlab, here are the login details.</p> <h4>Work ID is: </h4>'+req.body.workId+'<h4>Password:</h4>'+req.body.password;
+        data = '<p>Hello , someone has created an account for you on openlab, here are the login details.</p> <h4>Work ID is: </h4>'+req.body.workId+'<h4>Password:</h4>'+req.body.password+"<br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>";
     }if(op == 2){
         sub = "Openlab account terminated!"
-        data = "<p>Notification!</p><h4>Your openlab account has been closed. you will nolonger have access  to openlab</h4>"
+        data = "<p>Notification!</p><h4>Your openlab account has been closed. you will nolonger have access  to openlab</h4> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
+    }if(op == 3){
+        sub = "New Task From "+req.body.authorName+" on Openlab"
+        data = "<h4>You have A new Task from "+req.body.authorName+"</h4><p> task description : "+req.body.description+" </p> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
     }
-    let info =  await transporter.sendMail({
-        from : 'openlabprojects@gmail.com',
-        to : req.body.emailAddress,
-        subject : sub,
-        html :  data,
-    })
+
+
+    var transporter = mailer.createTransport(smtpTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        auth: {
+          user: 'openlabprojects@gmail.com',
+          pass: 'Victor03@'
+        }
+      }));
+      
+      var mailOptions = {
+        from: 'openlabprojects@gmail.com',
+        to: req.body.emailAddress,
+        subject: sub,
+        html: data
+      };
+      
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+    //res.json("done")
     
 }
 

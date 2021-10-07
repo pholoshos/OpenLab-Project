@@ -59,6 +59,7 @@ async function getNotifications(){
         
     })
 }
+
 async function updateEmployees() {
     counter += 1;
     if(counter == 1){
@@ -162,7 +163,7 @@ Vue.component('create-employee',{
     data : function(){
         return{
             phone : '0720648709',
-            email : 'example@email.com',
+            email : '',
             password  : '12345678',
             workId : randomString(10),
             position : 'worker',
@@ -356,7 +357,8 @@ Vue.component('tasks',{
                 axios.post(url,{
                     authkey : store.state.account.authkey,
                     _id : store.state.account._id,
-                    taskId : a._id
+                    taskId : a._id,
+                    emailAddress : a.authorEmail,
                 }).then((response)=>{
                     if(response.data){
                         store.commit('updateTasks',response.data);
@@ -600,8 +602,10 @@ Vue.component('creating-task',{
                             recipient : self.selectedEmployee._id,
                             author : store.state.account._id,
                             authorName : store.state.account.name,
+                            emailAddress : self.selectedEmployee.emailAddress,
                             description : self.description,
                             title : store.state.taskTitle,
+                            authorEmail : store.state.account.emailAddress,
                             
                         
                     }).then(function(response){

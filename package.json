@@ -16,6 +16,7 @@
     "express": "^4.17.1",
     "mongoose": "^5.13.2",
     "nodemailer": "^6.6.5",
+    "nodemailer-smtp-transport": "^2.7.4",
     "nodemon": "^2.0.9"
   }
 }
