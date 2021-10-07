@@ -173,7 +173,7 @@ const sendMessage = (req,res,op)=>{
         data = "<p>Notification!</p><h4>Your openlab account has been closed. you will nolonger have access  to openlab</h4> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
     }if(op == 3){
         sub = "New Task From "+req.body.authorName+" on Openlab"
-        data = "<h4>You have A new Task from "+req.body.authorName+"</h4><p> task description : "+req.body.description+" </p> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
+        data = "<h4>You have A new Task from "+req.body.authorName+"</h4><p> Title : "+req.body.title+" </p><p> task description : "+req.body.description+" </p> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
     }
     if(op == 4){
         sub = " "+req.body.authorName+" has completed Task on Openlab"
