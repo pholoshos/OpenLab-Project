@@ -77,7 +77,7 @@ const sendMessage = (req,res,op)=>{
     var sub = ""
     if(op == 1){
         sub = "Openlab Account Activated!"
-        data = '<p>Hello , someone has created an account for you on openlab, here are the login details.</p> <h4>Work ID is: </h4>'+req.body.workId+'<h4>Password:</h4>'+req.body.password+"<br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>";
+        data = "<p>Hello , someone has created an account for you on openlab, here are the login details.</p> <h4>Work ID is: </h4>"+req.body.workId+"<h4>Password:</h4>"+req.body.password;
     }if(op == 2){
         sub = "Openlab account terminated!"
         data = "<p>Notification!</p><h4>Your openlab account has been closed. you will nolonger have access  to openlab</h4> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
