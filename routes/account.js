@@ -151,8 +151,9 @@ router.post('/delete',(req,res)=>{
                 }
                 User.deleteOne(userData,(err)=>{
                     if(!err){
-                        res.json({results: 'done'})
                         sendMessage(req,res,2)
+                        res.json({results: 'done'})
+                        
                     }else{
                         res.status(500).json('failed')
                     }
