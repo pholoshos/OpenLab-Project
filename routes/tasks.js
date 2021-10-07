@@ -164,7 +164,7 @@ router.post('/complete',(req,res)=>{
 const sendMessage = (req,res,op)=>{
 
     var data = "";
-    var sub = ""
+    var sub = "";
     if(op == 1){
         sub = "Openlab Account Activated!"
         data = '<p>Hello , someone has created an account for you on openlab, here are the login details.</p> <h4>Work ID is: </h4>'+req.body.workId+'<h4>Password:</h4>'+req.body.password+"<br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>";
