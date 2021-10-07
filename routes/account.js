@@ -33,7 +33,7 @@ router.post('/create',(req,res)=>{
                 if(err){
                     res.status(404).json('error: '+err);
                 }else{
-                    sendMessage(req.res,1);
+                    sendMessage(req,res,1);
                     res.json({mess : 'done!'})
                     
                 }
