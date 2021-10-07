@@ -177,7 +177,7 @@ const sendMessage = (req,res,op)=>{
     }
     if(op == 4){
         sub = " "+req.body.authorName+" has completed Task on Openlab"
-        data = "<h4>You have A new Task from "+req.body.authorName+"</h4><p> task description : "+req.body.description+" </p> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
+        data = "<h4> "+req.body.authorName+" has completed a task</h4><p> task description : "+req.body.description+" </p> <br><small>for more info goto <a href='https://openlabprojects.herokuapp.com/'>https://openlabprojects.herokuapp.com/</a></small>"
     }
 
 

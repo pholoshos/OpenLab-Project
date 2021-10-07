@@ -359,6 +359,7 @@ Vue.component('tasks',{
                     _id : store.state.account._id,
                     taskId : a._id,
                     emailAddress : a.authorEmail,
+                    authorName : store.state.account.name,
                 }).then((response)=>{
                     if(response.data){
                         store.commit('updateTasks',response.data);
