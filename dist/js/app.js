@@ -296,7 +296,7 @@ Vue.component('manage-employees',{
         },
         
     },
-    template : '<div class="container" v-if="$store.state.account.account == accountType ">  <div> <br> <h4>Manage employees</h4> <button class="btn btn-secondary" @click="options(2)">Add</button> <button class="btn btn-secondary" @click="options(1)">View</button> <button class="btn btn-secondary" @click="options(3)">Delete</button>  <hr>  <view-employee v-if="view== 1"></view-employee> <create-employee v-if="view == 2"></create-employee> <delete-employee v-if="view == 3"></delete-employee>  <br></div> <br></div>'
+    template : '<div class="container" v-if="$store.state.account.account == accountType ">  <div> <br> <h4>Manage employees</h4> <button class="btn btn-success" @click="options(2)">Add</button> <button class="btn btn-secondary" @click="options(1)">View</button> <button class="btn btn-secondary" @click="options(3)">Delete</button>  <hr>  <view-employee v-if="view== 1"></view-employee> <create-employee v-if="view == 2"></create-employee> <delete-employee v-if="view == 3"></delete-employee>  <br></div> <br></div>'
 })
 Vue.component('view-employee',{
 
@@ -642,7 +642,7 @@ Vue.component('nav-bar',{
             
         }
     },
-    template : '<div>    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> <div class="container-fluid"> <router-link class="navbar-brand" to="/dashboard/home" ><img height="28" style="margin-bottom:5px;" src="./logo.png"> OPENLAB</router-link> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="navbarNav"> <ul class="navbar-nav"> <li class="nav-item"> <router-link class="ln" to="/dashboard/profile" >Profile</router-link> </li><li class=" navbar-item" style="color:green" v-if="status != isBusy ">Status({{status}})</li> <li class=" navbar-item" style="color:red" v-if="status == isBusy ">Status({{status}})</li></ul> </div> </div> </nav></div>'
+    template : '<div>    <nav class="navbar navbar-expand-lg navbar-light bg-light"> <div class="container-fluid"> <router-link class="navbar-brand" to="/dashboard/home" ><img height="28" style="margin-bottom:5px;" src="./logo.png"> OPENLAB</router-link> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="navbarNav"> <ul class="navbar-nav"> <li class="nav-item"> <router-link class="ln" to="/dashboard/profile" >Profile</router-link> </li><li class=" navbar-item" style="color:green" v-if="status != isBusy ">Status({{status}})</li> <li class=" navbar-item" style="color:red" v-if="status == isBusy ">Status({{status}})</li></ul> </div> </div> </nav></div>'
 })
 
 Vue.component('landing-page',{
