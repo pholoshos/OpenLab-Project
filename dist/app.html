@@ -64,11 +64,15 @@
           margin-top: 20%;
         }
       }
-      body{
+      .back{
         background-image: url("backgrounds.jpg");
         background-repeat: no-repeat;
         background-position: center;
         background-size: cover;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        margin:  0;
         
         
       }
@@ -79,7 +83,7 @@
     <title>Login - Welcome to openlab</title>
   </head>
   <body>
-    
+    <div class="back"></div>
     <div id="app">
       <div v-if="$store.state.isLoggedIn && !$store.state.loading">
         <dashboard></dashboard>
