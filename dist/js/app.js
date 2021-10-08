@@ -662,7 +662,7 @@ Vue.component('loading-screen',{
 })
 
 Vue.component('info',{
-    template : '<div> <br> <h4>App info and tips</h4> <p>Learn more about openlab</p> <hr>  <br></div>'
+    template : '<div> <br> <h4>App info and tips</h4> <p>Learn more about openlab</p> <hr>Welcome! <h4></h4<><p>Welcome to open lab, you will find info about updates here and how to do, when app is upgraded</p>  <br></div>'
 })
 
 Vue.component('manage-tasks',{
