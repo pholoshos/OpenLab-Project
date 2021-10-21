@@ -31,7 +31,7 @@ const UserSchema = mongoose.Schema({
     authkey : {
         required: true,
         type : String,
-        default : random(12),
+        default : random(100),
 
     },
     emailAddress: {

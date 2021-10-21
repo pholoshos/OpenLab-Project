@@ -44,7 +44,7 @@ const check = async (data,op,res)=>{
          }else{
              if(userFound){
                  if(op == 0){
-   
+                    /*
                      User.updateOne(data,{
                          authkey : rand
                      }, (err)=>{
@@ -53,6 +53,7 @@ const check = async (data,op,res)=>{
                              //return false;
                          }
                      })
+                     */
                   
                  }
                  User.findOne(data,'workId name authkey emailAddress account status phone department position _id',(err,user)=>{
